@@ -1,0 +1,30 @@
+As you are already aware, you've been given access to site KILO-CHARLIE-7's systems.
+You will unlock more systems with higher access tiers.
+This is a basic manual to help you get started.
+
+[1] Scanning and fixing failures
+Type 'scan' to scan for any failures.
+If a failure/failures are found, the failure(s) will be shown alongside the failure code.
+Type 'fix <failure code>' with a correct failure code to begin fixing the failure.
+Every failure will require you to do some task, with tasks varying based on the failure.
+More serious failures will be harder to fix. Some failures however should take priority over others.
+Keep in mind that some failures may directly affect some of your systems.
+
+[2] EXP and power management
+You start off with maximum power, and a max power value of 100. 
+Your power regenerates fairly slowly, so make sure to balance it properly.
+Fixing tasks costs power, with the amount of power scaling based on how serious the task is.
+Power will still get consumed even if you fail the task.
+You gain EXP for completing tasks, and after enough EXP your access tier will increase.
+A higher access tier will make you regenerate power quicker and also grants you access to new systems.
+You can check all of these stats with the 'check' command.
+
+[3] Basic utility commands
+The 'mail' command allows you to manage your mail
+Typing 'delete <mail number>' will delete the mail
+Typing 'open <mail number>' or '<mail number>' will view the mail
+The 'request <file>' command requests a file from the server and shows it's contents
+You wont be able to access most of the files from the servers, but you will be granted access to the files that you need.
+
+This will be all you need up until access tier 2.
+Make sure to frequently check your mail for any new information.

@@ -1,0 +1,13 @@
+Dr. Dan
+Access Tier 2
+
+Hello again. Monitors show you've reached access tier 2.
+You now have access to the upgrade system, accessible through 'upgrade'.
+You are able to upgrade certain systems with the cost of your power.
+Upgrading a system will cost a decent chunk of power, and may also heavily reduce power gain.
+You can start by upgrading your scanner, allowing you to scan for failures more efficiently.
+
+You can also view some other data through 'request tier2.txt'
+
+Kind regards,
+Dr. Dan
