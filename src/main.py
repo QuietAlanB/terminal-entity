@@ -580,10 +580,10 @@ gracePeriod = 30
 
 power = 100
 maxPower = 100
-xp = 90
+xp = 0
 maxXP = 100
-accessTier = 5
-powerRegen = 0.01 # the higher this is, the slower it is
+accessTier = 1
+powerRegen = 2 # the higher this is, the slower it is
 	       # (seconds between power regens)
 
 failures = [DOOR_ERROR("aa")]
