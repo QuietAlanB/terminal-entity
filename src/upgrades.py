@@ -17,6 +17,9 @@ class Upgrade:
                 self.UpdateValues()
 
         def UpdateValues(self):
+                if (len(self.powerLevels) == self.level - 1):
+                        return
+
                 self.power = self.powerLevels[self.level - 1]
                 self.time = self.timeLevels[self.level - 1]
                 self.access = self.accessLevels[self.level - 1]

@@ -586,7 +586,7 @@ accessTier = 1
 powerRegen = 2 # the higher this is, the slower it is
 	       # (seconds between power regens)
 
-failures = [DOOR_ERROR("aa")]
+failures = []
 
 mails = [CreateMail("start")]
 
@@ -661,6 +661,9 @@ while True:
 	# the player to upgrade some systems (like the scanner)
 	elif (args[0].lower() in ["construction", "upgrade"] and accessTier >= 2):
 		UpgradeSystem()
+
+	elif (args[0].lower() == "endgrace"):
+		gracePeriod = 0
 
 print("GAME ENDED")
 
