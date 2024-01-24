@@ -21,8 +21,8 @@ You can check all of these stats with the 'check' command.
 
 [3] Basic utility commands
 The 'mail' command allows you to manage your mail
-Typing 'delete <mail number>' will delete the mail
-Typing 'open <mail number>' or '<mail number>' will view the mail
+Typing 'delete <mail number>' in the mail interface will delete the mail
+Typing 'open <mail number>' or '<mail number>' in the mail interface will view the mail
 The 'request <file>' command requests a file from the server and shows it's contents
 You wont be able to access most of the files from the servers, but you will be granted access to the files that you need.
 

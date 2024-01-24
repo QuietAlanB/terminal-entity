@@ -12,6 +12,5 @@ Please input 'request help.txt' to get started.
 Thank you,
 Dr. Dan
 
- -- Dan Sarger 
- -- <sargdan@kc7.entlabs.net>
+ -- Dan Sarger <sargdan@kc7.entlabs.net>
  -- Office Room 82 Sector A

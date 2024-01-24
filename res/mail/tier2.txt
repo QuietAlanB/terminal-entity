@@ -12,6 +12,5 @@ You will recieve another mail at access tier 3.
 Kind regards,
 Dr. Dan
 
- -- Dan Sarger 
- -- <sargdan@kc7.entlabs.net>
+ -- Dan Sarger <sargdan@kc7.entlabs.net>
  -- Office Room 82 Sector A

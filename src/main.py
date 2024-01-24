@@ -7,7 +7,8 @@ import copy
 from color import COLOR
 from failures import *
 from mail import *
-from upgrades import Upgrade
+from upgrades import *
+from network import *
 
 os.system("")
 
@@ -22,7 +23,7 @@ if (playStart):
 	time.sleep(0.4)
 	print("")
 	print("ENTITYLABS-TEC PIL-6")
-	print("VERSION 2.5")
+	print("VERSION 1.1")
 	print("DO NOT DISTRIBUTE THIS TECHNOLOGY")
 	time.sleep(0.4)
 	print("")
@@ -54,8 +55,8 @@ if (playStart):
 	time.sleep(0.4)
 
 	print(">> ", end="", flush=True)
-	time.sleep(0.4)
-	for char in "connect 275.62.99.108:21":
+	time.sleep(0.8)
+	for char in "connect 232.62.99.108:21":
 		print(char, end="", flush=True)
 		time.sleep(0.02)
 	time.sleep(0.4)
@@ -69,7 +70,7 @@ if (playStart):
 
 	print(">> ", end="", flush=True)
 	time.sleep(0.6)
-	for char in "ping 10.238.44.149 /n 2":
+	for char in "ping 10.238.44.149 /n 3":
 		print(char, end="", flush=True)
 		time.sleep(0.02)
 
@@ -79,13 +80,15 @@ if (playStart):
 	print("Pinging 10.238.44.149 with 32 bytes of data:")
 	time.sleep(0.75)
 	print("    Reply from 10.238.44.149: bytes=32 time=15ms")
-	time.sleep(1.75)
+	time.sleep(0.75)
 	print("    Reply from 10.238.44.149: bytes=32 time=16ms")
-	time.sleep(1)
+	time.sleep(0.75)
+	print("    Reply from 10.238.44.149: bytes=32 time=16ms")
+	time.sleep(0.75)
 	print("")
 	time.sleep(3.3)
 	print("FTP connection request from 10.238.44.149 at PORT 21")
-	time.sleep(0.1)
+	time.sleep(0.3)
 	print("Accept? y/n")
 	time.sleep(0.1)
 	print(">> ", end="", flush=True)
@@ -98,11 +101,11 @@ if (playStart):
 	print(f"{COLOR.LIGHTGREEN}Connection established{COLOR.WHITE}")
 	time.sleep(0.2)
 	print(f"Downloading data... [1/3]")
-	time.sleep(2.2)
-	print(f"Downloading data... [2/3]")
-	time.sleep(3.8)
-	print(f"Downloading data... [3/3]")
 	time.sleep(1.8)
+	print(f"Downloading data... [2/3]")
+	time.sleep(2.2)
+	print(f"Downloading data... [3/3]")
+	time.sleep(1.3)
 	print(f"{COLOR.LIGHTGREEN}Download complete{COLOR.WHITE}")
 	time.sleep(0.1)
 	
@@ -127,22 +130,22 @@ if (playStart):
 	time.sleep(0.9)
 
 	print("Checking firmware ", end="", flush=True)
-	time.sleep(0.6)
+	time.sleep(0.5)
 	print(f"[ {COLOR.LIGHTGREEN}OK{COLOR.WHITE} ]")
 	time.sleep(0.3)
 
 	print("NETWORK CONNECTION ", end="", flush=True)
-	time.sleep(0.7)
+	time.sleep(0.6)
 	print(f"[ {COLOR.LIGHTGREEN}OK{COLOR.WHITE} ]")
 	time.sleep(0.2)
 
 	print("POWER SUPPLY CONNECTION ", end="", flush=True)
-	time.sleep(1.1)
+	time.sleep(0.7)
 	print(f"[ {COLOR.LIGHTGREEN}OK{COLOR.WHITE} ]")
 	time.sleep(0.2)
 
 	print("SERVER CONNECTION ", end="", flush=True)
-	time.sleep(1.5)
+	time.sleep(1.7)
 	print(f"[ {COLOR.RED}FAIL{COLOR.WHITE} ]")
 	time.sleep(0.2)
 	print(f"    {COLOR.YELLOW}CONNECTING TO PORT 22...{COLOR.WHITE}")
@@ -365,6 +368,56 @@ def UpgradeSystem():
 		# power failure causes systems to run slower
 		if (IsFailure("POWER_FAILURE")): upgrade.time *= 2
 
+def Network():
+	inNetworkInterface = True
+	
+	while inNetworkInterface:
+		networkInput = input("Network >> ")
+		args = networkInput.split(" ")
+
+		if (args[0].lower() in ["exit", "leave"]):
+			inNetworkInterface = False
+
+		elif (args[0].lower() != "port"):
+			continue
+
+		# all of the next code is for the "port" command
+		if (len(args) <= 1):
+			print(f"{COLOR.RED}Unknown arguments{COLOR.WHITE}")
+			continue
+
+		# view port
+		if (args[1].isdecimal()):
+			port = GetPort(int(args[1]))
+			print(f"PORT {port.num}")
+
+			if (port.open): 
+				print(f"OPEN : {port.state}")
+			else: 
+				print(f"CLOSED : LOCKED")
+
+			print("CONNECTIONS:")
+			if (port.internalConnection != None): print(f"{port.internalConnection.ip}", end="")
+			else: print("N/A", end="")
+			if (port.externalConnection != None): print(f" <-> {port.externalConnection.ip}", end="")
+			else: print(" <-> N/A")
+
+		elif (args[1] == "list"):
+			portOpen = True
+			if (len(args) == 3):
+				if (args[2] == "closed"):
+					portOpen = False
+
+			for port in ports:
+				if (port.open == portOpen):
+					print(f"PORT {port.num} : {port.state} : ", end="")
+					if (port.internalConnection != None): print(f"{port.internalConnection} <-> ", end="")
+					else: print(f"N/A <-> ", end="")
+					if (port.externalConnection != None): print(f"{port.externalConnection}")
+					else: print(f"N/A")
+
+				
+
 # game mechanics
 def PowerUpdate():
 	global power
@@ -580,6 +633,9 @@ def GetUpgrade(name):
 		
 	return None
 
+def GetPort(num):
+	return ports[num - 1]
+
 endGame = False
 
 gracePeriod = 30
@@ -588,7 +644,7 @@ power = 100
 maxPower = 100
 xp = 0
 maxXP = 100
-accessTier = 1
+accessTier = 3
 powerRegen = 2 # the higher this is, the slower it is
 	       # (seconds between power regens)
 
@@ -601,6 +657,12 @@ upgrades = [
 	Upgrade("Nuclear Reactor", 1, [95, 120, 190, 230], [60, 90, 120, 180], [1, 3, 5, 6]),
 	Upgrade("Construction System", 1, [100, 110], [60, 150], [3, 4])
 ]
+
+ports = []
+for i in range(1024):
+	ports.append(
+		Port(i + 1, False, "LISTENING", None, None)
+	)
 
 powerUpdate = threading.Thread(target=PowerUpdate)
 failureUpdate = threading.Thread(target=FailureUpdate)
@@ -678,6 +740,9 @@ while True:
 
 	elif (args[0].lower() == "endgrace"):
 		gracePeriod = 0
+
+	elif (args[0].lower() == "network" and accessTier >= 3):
+		Network()
 
 print("GAME ENDED")
 
