@@ -228,7 +228,9 @@ class COOLER_ERROR(Failure):
 				return False
 			
 			guesses -= 1
-			if (guesses == 0): return False
+			if (guesses == 0): 
+				if (int(guess) == number): break
+				return False
 
 			if (int(guess) < number): print(f"Higher - {guesses} guess(es) left")
 			elif (int(guess) > number): print(f"Lower - {guesses} guess(es) left")
@@ -415,7 +417,7 @@ class NETWORK_PROBLEM(Failure):
 			nums.append(random.randint(1, 150))
 
 		print("Sort this list in order from smallest to largest")
-		print("You can type '<index 1> <index 2>' to swap 2 elements at those index")
+		print("You can type '<index 1> <index 2>' to swap 2 elements at those indices")
 		print("Keep in mind they are numbered 1 -> 5   ! NOT 0 -> 4 !")
 		print(f"[ ", end="")
 		for num in nums:

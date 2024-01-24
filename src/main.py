@@ -172,7 +172,6 @@ if (playStart):
 	print("Starting KILO-CHARLIE-7 MANAGEMENT TERMINAL...")
 	time.sleep(1.6)
 
-
 # terminal commands
 def Check():
 	percent = round(power / maxPower * 100, 2)
@@ -221,7 +220,7 @@ def Fix(code):
 
 	failure = None
 	for failure_ in failures:
-		if (failure_.code == code):
+		if (failure_.code == code.upper()):
 			failure = failure_
 
 	if (failure == None):
@@ -276,7 +275,7 @@ def Mails():
 		print(f"{COLOR.RED}Mail not found{COLOR.WHITE}")
 		return
 
-	if (mailArgs[0] == "open"):
+	if (mailArgs[0] in ["open", "read"]):
 		mails[index].Print()
 
 	elif (mailArgs[0] in ["del", "delete"]):
@@ -285,7 +284,6 @@ def Mails():
 
 def UpgradeSystem():
 	global power
-	print("Type the name of a system to upgrade it")
 	constructionSystem = GetUpgrade("Construction System")
 	if (constructionSystem.upgrading):
 		print(f"{COLOR.RED}CONSTRUCTION SYSTEM CURRENTLY UNDER MAINTENANCE{COLOR.WHITE}")
@@ -308,6 +306,7 @@ def UpgradeSystem():
 		if (accessTier < upgrade.access):
 			print(f"{COLOR.RED}    ACCESS TIER {upgrade.access} REQUIRED{COLOR.WHITE}")
 
+	print("Type the name of a system to upgrade it")
 	upgradeInput = input("Upgrade >> ")
 
 	for upgrade in upgrades:
@@ -605,10 +604,14 @@ upgradeUpdate.start()
 
 print("---------- SITE KILO-CHARLIE-7 MANAGEMENT TERMINAL ----------")
 print(f"{COLOR.BLUE}Please type 'mail' to view your current emails{COLOR.WHITE}")
+print(f"{COLOR.BLUE}Type '1' in the mail interface to view your first mail{COLOR.WHITE}")
 
 while True:
-	inText = input(">> ")
-	args = inText.split(" ")
+	try:
+		inText = input(">> ")
+		args = inText.split(" ")
+	except KeyboardInterrupt:
+		endGame = True
 
 	if (endGame): break
 	
@@ -646,6 +649,10 @@ while True:
 			print(f"{COLOR.RED}SERVER_ERROR, CODE {failure.code}{COLOR.WHITE}")
 			continue
 	
+		if (len(args) <= 1):
+			print(f"{COLOR.RED}No file specified{COLOR.WHITE}")
+			continue
+
 		filePath = "res/files/" + args[1]
 		try:
 			file = open(filePath, "r")

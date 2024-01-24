@@ -7,7 +7,11 @@ You are able to upgrade certain systems with the cost of your power.
 Upgrading a system will cost a decent chunk of power, and may also heavily reduce power gain.
 You can start by upgrading your scanner, allowing you to scan for failures more efficiently.
 
-You can also view some other data through 'request tier2.txt'
+You will recieve another mail at access tier 3.
 
 Kind regards,
 Dr. Dan
+
+ | Dan Sarger 
+ | <sargdan@kc7.entlabs.net>
+ | Office Room 82 Sector A
