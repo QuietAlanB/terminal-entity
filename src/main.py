@@ -202,6 +202,10 @@ def Scan():
 		case 3: duration = 3
 		case 4: duration = 1
 
+	# power failure makes systems run slower
+	if (IsFailure("POWER_FAILURE")): 
+		duration *= 2
+
 	time.sleep(duration)
 
 	if (len(failures) <= 0):
@@ -358,6 +362,9 @@ def UpgradeSystem():
 		print(f"Begun upgrading: {upgrade.name}")
 		upgrade.StartUpgrade()
 
+		# power failure causes systems to run slower
+		if (IsFailure("POWER_FAILURE")): upgrade.time *= 2
+
 # game mechanics
 def PowerUpdate():
 	global power
@@ -452,7 +459,7 @@ def FailureUpdate():
 			if (failure.name == "SITE_BLACKOUT" and IsFailure("POWER_FAILURE")):
 				chance = int(chance * 0.5)
 			if (failure.name == "POWER_FAILURE" and IsFailure("REAC_FAILURE")):
-				chance = int(chance * 0.5)
+				chance = int(chance * 0.45)
 			if (failure.name == "POWER_FAILURE" and IsFailure("BACKUP_REAC_FAILURE")):
 				chance = int(chance * 0.6)
 
