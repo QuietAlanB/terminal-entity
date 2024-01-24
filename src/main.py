@@ -657,7 +657,7 @@ while True:
 		print("---------------------------")
 		file.close()
 
-	# upgrading is explained in the document, but this will allow
+	# upgrading is explained in my document, but this will allow
 	# the player to upgrade some systems (like the scanner)
 	elif (args[0].lower() in ["construction", "upgrade"] and accessTier >= 2):
 		UpgradeSystem()
