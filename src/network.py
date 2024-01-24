@@ -25,7 +25,7 @@ class Port:
                 self.Disconnect()
 
         def Disconnect(self):
-                self.internalIP = None
+                self.externalIP = None
 
         def ConnectInternal(self, connection):
                 self.internalConnection = connection

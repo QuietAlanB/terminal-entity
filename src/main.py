@@ -402,7 +402,7 @@ def Network():
 			if (port.externalConnection != None): print(f" <-> {port.externalConnection.ip}", end="")
 			else: print(" <-> N/A")
 
-		elif (args[1] == "list"):
+		elif (args[1].lower() == "list"):
 			portOpen = True
 			if (len(args) == 3):
 				if (args[2] == "closed"):
@@ -415,6 +415,23 @@ def Network():
 					else: print(f"N/A <-> ", end="")
 					if (port.externalConnection != None): print(f"{port.externalConnection}")
 					else: print(f"N/A")
+					
+		elif (args[1].lower() in ["open", "close", "disconnect", "dc"]):
+			if (not args[2].isdecimal()):
+				print(f"{COLOR.RED}Not a number{COLOR.WHITE}")
+				continue
+
+			action = args[1].lower()
+			port = int(args[2])
+
+			if (action == "open"):
+				ports[port - 1].Open()
+			elif (action == "close"):
+				ports[port - 1].Close()
+				print(f"{COLOR.RED}PORT {port} CLOSED{COLOR.WHITE}")
+			elif (action in ["disconnect", "dc"]):
+				ports[port - 1].Disconnect()
+			
 
 				
 
