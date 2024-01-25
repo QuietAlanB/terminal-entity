@@ -1,0 +1,17 @@
+Dr. Dan
+Access Tier 3
+
+Hello once again. I must congratulate you for your work, as you are much more successful than we ever thought
+you could be. Thank you for keeping the site maintained and under control.
+You have reached access tier 3, and have now unlocked access to managing the site's network system.
+You can access the network interface by simply typing the 'network' command.
+Many of the commands do need a decent amount of explanation, which will all be located in the 'network_help.txt' file.
+Please request the file as soon as you can, and read carefully.
+Now that you've been given control of the site network, you will have to take charge in preventing cyberattacks.
+How to do this as well as a lot of other information is in the 'network_help.txt" file.
+
+Kind regards,
+Dr. Dan
+
+ -- Dan Sarger <sargdan@kc7.entlabs.net>
+ -- Office Room 82 Sector A

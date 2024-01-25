@@ -370,14 +370,12 @@ def UpgradeSystem():
 
 def Network():
 	global monitoringPort
-	inNetworkInterface = True
 	
-	while inNetworkInterface:
+	while True:
 		networkInput = input("Network >> ")
 		args = networkInput.split(" ")
 
 		if (args[0].lower() in ["exit", "leave"]):
-			inNetworkInterface = False
 			break
 
 		elif (args[0].lower() != "port"):
@@ -390,6 +388,10 @@ def Network():
 
 		# view port
 		if (args[1].isdecimal()):
+			if (int(args[1]) > 1024):
+				print(f"{COLOR.RED}Port doesn't exist{COLOR.WHITE}")
+				continue
+
 			port = GetPort(int(args[1]))
 			print(f"PORT {port.num}")
 
@@ -434,6 +436,7 @@ def Network():
 			print(f"LIST OF {portType.upper()} PORTS:")
 
 			for port in ports:
+				# has code for a NOT_BOUND type port
 				if (portType == "open" and port.open):
 					print(f"PORT {port.num} | {port.state} | ", end="")
 					if (port.state == "NOT_BOUND"): print(f"No internal IP connected")
@@ -453,6 +456,10 @@ def Network():
 				print(f"{COLOR.RED}Not a number{COLOR.WHITE}")
 				continue
 
+			if (int(args[2]) > 1024):
+				print(f"{COLOR.RED}Port doesn't exist{COLOR.WHITE}")
+				continue
+
 			action = args[1].lower()
 			port = ports[int(args[2]) - 1]
 
@@ -461,7 +468,7 @@ def Network():
 			if (action in ["dc", "disconnect"]): port.Disconnect()
 			
 		elif (args[1].lower() == "scan"):
-			# finish later
+			# finish when i have actual dangers from the network
 			pass
 
 		elif (args[1].lower() == "monitor"):
@@ -475,11 +482,17 @@ def Network():
 
 			port = int(args[2])
 
+			if (port > 1024):
+				print(f"{COLOR.RED}Port doesn't exist{COLOR.WHITE}")
+				continue
+
+			print("Press ENTER to stop monitoring")
+
 			monitorPortThread = threading.Thread(target=MonitorPort, args=[port])
 			monitoringPort = True
 			monitorPortThread.start()
 
-			input("Press ENTER to stop monitoring")
+			input("")
 
 			monitoringPort = False
 			monitorPortThread.join()
@@ -601,8 +614,8 @@ def FailureUpdate():
 		time.sleep(1)
 
 def UpgradeUpdate():
+	global endGame
 	while True:
-		global endGame
 		if (endGame): break
 
 		for upgrade in upgrades:
@@ -612,6 +625,13 @@ def UpgradeUpdate():
 
 			upgrade.Update()
 
+		time.sleep(1)
+		
+def PortUpdate():
+	while True:
+		for port in ports:
+			port.Update()
+			
 		time.sleep(1)
 
 # used to manage leveling up
@@ -642,13 +662,22 @@ def AddXP(addXP, reason = "Failure fixed"):
 		maxPower = maxPowerLT[accessTier - 2]
 		powerRegen = powerRegenLT[accessTier - 2]
 
+		print(f"   {COLOR.WHITE}- {COLOR.BLUE}Maximum power{COLOR.WHITE} increased to {maxPower}")
+
 		match accessTier:
 			case 2:
-				print(f"   {COLOR.WHITE}- {COLOR.BLUE}Maximum power{COLOR.WHITE} increased to {maxPower}")
-				print(f"   {COLOR.WHITE}- {COLOR.BLUE}CONSTRUCTION SYSTEM{COLOR.WHITE} available - use with 'upgrade' command")
-				print(f"   {COLOR.WHITE}- Check mail for more information")
+				print(f"   - {COLOR.BLUE}CONSTRUCTION SYSTEM{COLOR.WHITE} available - use with 'upgrade' command")
+				print(f"   - Check mail for more information")
 
 				mails.append(CreateMail("tier2"))
+
+			case 3:
+				print(f"   - {COLOR.BLUE}NETWORK SYSTEM{COLOR.WHITE} available - use with 'network' command")
+				print(f"   - New threat: {COLOR.BLUE}CYBERATTACKS{COLOR.WHITE}")
+				print(f"   - Check mail for more information")
+
+				mails.append(CreateMail("tier3"))
+				
 
 def MonitorPort(port):
 	port = ports[port - 1]
@@ -740,18 +769,15 @@ for i in range(1024):
 		Port(i + 1, False, "", None, None)
 	)
 
-ports[0].Open()
-ports[0].ConnectInternal(Connection("192.168.2.205", ""))
-ports[0].Connect(Connection("243.8.98.102", ""))
-ports[0].Connect(test("24.4.4.2"))
-
 
 powerUpdate = threading.Thread(target=PowerUpdate)
 failureUpdate = threading.Thread(target=FailureUpdate)
 upgradeUpdate = threading.Thread(target=UpgradeUpdate)
+portUpdate = threading.Thread(target=PortUpdate)
 powerUpdate.start()
 failureUpdate.start()
 upgradeUpdate.start()
+portUpdate.start()
 
 print("---------- SITE KILO-CHARLIE-7 MANAGEMENT TERMINAL ----------")
 print(f"{COLOR.BLUE}Please type 'mail' to view your current emails{COLOR.WHITE}")
@@ -831,3 +857,4 @@ print("GAME ENDED")
 powerUpdate.join()
 failureUpdate.join()
 upgradeUpdate.join()
+portUpdate.join()

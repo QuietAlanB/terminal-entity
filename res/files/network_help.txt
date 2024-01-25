@@ -1,0 +1,47 @@
+----------------------------------
+KILO-CHARLIE-7 SITE NETWORK MANUAL
+       WRITTEN BY DR. GRAVES
+----------------------------------
+Kilo-Charlie-7's site network is fairly straightforward:
+There are a total of 1024 different ports that connections can come in through.
+Every port has an "internal connection" and an "external connection" (normally referred to as just the "connection").
+The internal connection is a connection inside of the site, such as a server or computer.
+The external connection is a connection outside of the site, normally in a server or computer fairly far away.
+This manual outlines how to use the KC7 Management Terminal to manage the site's network.
+
+Ensure that you have entered the network interface by typing 'network'. The input arrow should show 'Network >>'
+You can exit the network interface by typing 'exit'.
+
+[1] VIEWING PORTS
+The 'port' command is used for managing practically the entire network, however the arguments of this command
+will change based on what you'd like to do.
+To view a port, simply type 'port <port number>'. 
+This will display if the port is open/closed, the port state, and the connections of the port.
+
+[1.1] VIEWING MULTIPLE PORTS
+The 'port list' command argument can be used to view many ports at once. 
+Typing 'port list' or 'port list open' will list all open ports.
+Typing 'port list closed' will list all closed ports, though this isn't useful.
+Typing 'port list <state>' will list all ports with that state
+
+[1.2] PORT STATES
+Ports have 4 distinct states they can be in: LISTENING, IDLE, CONNECTED, NOT_BOUND
+IDLE means that the port has an internal and external connection but no data is being sent through the port
+LISTENING means that the port has an internal connection but no external connection
+CONNECTED means that the port has data being sent through it
+NOT_BOUND means that the port has no internal connection
+
+[2] MANAGING PORTS
+Typing 'port <open/close/disconnect> <port number>' will either open, close or disconnect a port depending on the 1st
+argument.
+Opening a port allows connections through the port.
+Closing a port will block all connections through the port.
+Disconnecting a port will kick the connection off the port, but keep the port open. (Internal connection will still be connected to the port)
+
+[3] MONITORING PORTS
+Typing 'port monitor <port number>' will start monitoring a port.
+This will send you the data being sent through the port, as well as what connection the data is being sent to.
+Pressing ENTER while monitoring will stop monitoring that port.
+
+[4] SCANNING PORTS
+Not implemented.

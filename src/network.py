@@ -43,11 +43,11 @@ class Port:
                 if (self.internalConnection == None):
                         self.state = "NOT_BOUND"
                 elif (self.connection == None and self.internalConnection != None):
-                        self.state = "IDLE"
+                        self.state = "LISTENING"
                 elif (self.internalData != "" or self.data != ""):
                         self.state = "CONNECTED"
                 elif (self.internalConnection != None and self.connection != None):
-                        self.state = "LISTENING"
+                        self.state = "IDLE"
 
         # called every second
         def Update(self):
@@ -76,11 +76,3 @@ class Connection:
         # called by the port
         def Update(self, port):
                 pass
-
-
-class test(Connection):
-        def __init__(self, ip):
-                super().__init__(ip, "")
-
-        def Update(self, port):
-                self.data = "SENT."
