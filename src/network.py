@@ -1,45 +1,53 @@
 import time
 
 class Port:
-        def __init__(self, num, open, state, internalConnection = None, externalConnection = None):
+        def __init__(self, num, open, state, internalConnection = None, connection = None):
                 self.num = num
                 self.open = open
 
                 # valid states are:
                 # LISTENING - 'waiting' for a connection, just free
-                # IDLE - no data is being sent but IP is connected to port
+                # IDLE - no data is being sent but there is a connection
                 # CONNECTED - sending/recieving data
+                # NOT_BOUND - no internal connection
+                
                 self.state = state
 
                 self.internalConnection = internalConnection
-                self.externalConnection = externalConnection
+                self.connection = connection
 
-                self.internalData = Data("", "")
-                self.externalData = Data("", "")
+                self.internalData = ""
+                self.data = ""
 
         def Open(self):
                 self.open = True
+                self.UpdateState()
         
         def Close(self):
                 self.open = False
                 self.Disconnect()
 
         def Disconnect(self):
-                self.externalIP = None
+                self.connection = None
+                self.UpdateState()
 
         def ConnectInternal(self, connection):
                 self.internalConnection = connection
+                self.UpdateState()
 
-        def ConnectExternal(self, connection):
-                self.externalConnection = connection
+        def Connect(self, connection):
+                self.connection = connection
+                self.UpdateState()
 
         def UpdateState(self):
-                if (self.internalConnection == None and self.externalConnection == None):
-                        self.state = "LISTENING"
-                elif (self.internalData.data != "" or self.externalData.data != ""):
-                        self.state = "CONNECTED"
-                elif (self.internalConnection != None or self.externalConnection != None):
+                if (self.internalConnection == None):
+                        self.state = "NOT_BOUND"
+                elif (self.connection == None and self.internalConnection != None):
                         self.state = "IDLE"
+                elif (self.internalData != "" or self.data != ""):
+                        self.state = "CONNECTED"
+                elif (self.internalConnection != None and self.connection != None):
+                        self.state = "LISTENING"
 
         # called every second
         def Update(self):
@@ -47,9 +55,9 @@ class Port:
                         self.internalConnection.Update(self)
                         self.internalData = self.internalConnection.data
 
-                if (self.externalConnection != None):
-                        self.externalConnection.Update(self)
-                        self.externalData = self.externalConnection.data
+                if (self.connection != None):
+                        self.connection.Update(self)
+                        self.data = self.connection.data
 
                 self.UpdateState()
                 
@@ -62,19 +70,9 @@ class Connection:
                 self.data = data
 
         def SendData(self, data):
-                self.data = Data(data, "send")
-
-        def RecvData(self, data):
-                self.data = Data(data, "recv")
+                self.data = data
 
         # called every second while connected to a port
         # called by the port
         def Update(self, port):
                 pass
-
-# used to differentiate between recieved data and sent data
-# used for monitoring connections
-class Data:
-        def __init__(self, data, type):
-                self.data = data
-                self.type = type

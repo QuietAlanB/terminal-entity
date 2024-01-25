@@ -377,6 +377,7 @@ def Network():
 
 		if (args[0].lower() in ["exit", "leave"]):
 			inNetworkInterface = False
+			break
 
 		elif (args[0].lower() != "port"):
 			continue
@@ -391,49 +392,79 @@ def Network():
 			port = GetPort(int(args[1]))
 			print(f"PORT {port.num}")
 
-			if (port.open): 
-				print(f"OPEN : {port.state}")
-			else: 
-				print(f"CLOSED : LOCKED")
+			openText = "OPEN"
+			stateText = port.state
+			if (not port.open): 
+				openText = "CLOSED"
+				stateText = "CLOSED"
+
+			openTextColorDict = {
+				"CLOSED": COLOR.RED,
+				"OPEN": COLOR.LIGHTGREEN
+			}
+
+			stateTextColorDict = {
+				"IDLE": COLOR.BLUE,
+				"LISTENING": COLOR.YELLOW,
+				"CONNECTED": COLOR.LIGHTGREEN,
+				"NOT_BOUND": COLOR.RED,
+				"CLOSED": COLOR.RED
+			}
+
+			print(f"{openTextColorDict[openText]}{openText}{COLOR.WHITE}, ", end="")
+			print(f"{stateTextColorDict[stateText]}{stateText}{COLOR.WHITE}")
 
 			print("CONNECTIONS:")
-			if (port.internalConnection != None): print(f"{port.internalConnection.ip}", end="")
-			else: print("N/A", end="")
-			if (port.externalConnection != None): print(f" <-> {port.externalConnection.ip}", end="")
-			else: print(" <-> N/A")
+			if (not port.open): print(f"    Port closed")
+			elif (port.internalConnection == None): print(f"    No internal IP connected")
+			elif (port.state == "IDLE"): print(f"    {port.internalConnection.ip} <-> NO EXT. CONNECTION")
+			else: print(f"    {port.internalConnection.ip} <-> {port.connection.ip}")
 
+		# view all ports of a certain type
 		elif (args[1].lower() == "list"):
-			portOpen = True
-			if (len(args) == 3):
-				if (args[2] == "closed"):
-					portOpen = False
+			portType = "open"
+			if (len(args) >= 3):
+				portType = args[2].lower()
+
+			if (portType not in ["open", "closed", "connected", "idle", "listening", "not_bound"]):
+				print(f"{COLOR.RED}Invalid port type{COLOR.WHITE}")
+				continue
+
+			print(f"LIST OF {portType.upper()} PORTS:")
 
 			for port in ports:
-				if (port.open == portOpen):
-					print(f"PORT {port.num} : {port.state} : ", end="")
-					if (port.internalConnection != None): print(f"{port.internalConnection} <-> ", end="")
-					else: print(f"N/A <-> ", end="")
-					if (port.externalConnection != None): print(f"{port.externalConnection}")
-					else: print(f"N/A")
-					
+				if (portType == "open" and port.open):
+					print(f"PORT {port.num} | {port.state} | ", end="")
+					if (port.state == "NOT_BOUND"): print(f"No internal IP connected")
+					else: print(f"{port.internalConnection.ip} <-> {port.connection.ip}")
+
+				elif (portType == "closed" and not port.open):
+					print(f"PORT {port.num} | CLOSED")
+
+				elif (portType.upper() == port.state):
+					print(f"PORT {port.num} | {port.state} | ", end="")
+					if (port.state == "NOT_BOUND"): print(f"No internal IP connected")
+					else: print(f"{port.internalConnection.ip} <-> {port.connection.ip}")
+						
+		# open / close / disconnect a specific port
 		elif (args[1].lower() in ["open", "close", "disconnect", "dc"]):
 			if (not args[2].isdecimal()):
 				print(f"{COLOR.RED}Not a number{COLOR.WHITE}")
 				continue
 
 			action = args[1].lower()
-			port = int(args[2])
+			port = ports[int(args[2]) - 1]
 
-			if (action == "open"):
-				ports[port - 1].Open()
-			elif (action == "close"):
-				ports[port - 1].Close()
-				print(f"{COLOR.RED}PORT {port} CLOSED{COLOR.WHITE}")
-			elif (action in ["disconnect", "dc"]):
-				ports[port - 1].Disconnect()
+			if (action == "open"): port.Open()
+			if (action == "close"): port.Close()
+			if (action in ["dc", "disconnect"]): port.Disconnect()
 			
+		elif (args[1].lower() == "scan"):
+			# finish later
+			pass
 
-				
+		elif (args[1].lower() == "monitor"):
+			pass
 
 # game mechanics
 def PowerUpdate():
@@ -601,6 +632,10 @@ def AddXP(addXP, reason = "Failure fixed"):
 
 				mails.append(CreateMail("tier2"))
 
+def MonitorPort(port):
+	pass
+
+
 
 # utility functions
 def IsFailure(failureName):
@@ -675,11 +710,16 @@ upgrades = [
 	Upgrade("Construction System", 1, [100, 110], [60, 150], [3, 4])
 ]
 
+monitoringPort = False
 ports = []
 for i in range(1024):
 	ports.append(
-		Port(i + 1, False, "LISTENING", None, None)
+		Port(i + 1, False, "", None, None)
 	)
+
+ports[0].Open()
+ports[0].ConnectInternal(Connection("192.168.2.205", ""))
+ports[0].Connect(Connection("243.8.98.102", ""))
 
 powerUpdate = threading.Thread(target=PowerUpdate)
 failureUpdate = threading.Thread(target=FailureUpdate)
