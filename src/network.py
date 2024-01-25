@@ -76,3 +76,11 @@ class Connection:
         # called by the port
         def Update(self, port):
                 pass
+
+
+class test(Connection):
+        def __init__(self, ip):
+                super().__init__(ip, "")
+
+        def Update(self, port):
+                self.data = "SENT."

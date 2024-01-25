@@ -369,6 +369,7 @@ def UpgradeSystem():
 		if (IsFailure("POWER_FAILURE")): upgrade.time *= 2
 
 def Network():
+	global monitoringPort
 	inNetworkInterface = True
 	
 	while inNetworkInterface:
@@ -464,7 +465,24 @@ def Network():
 			pass
 
 		elif (args[1].lower() == "monitor"):
-			pass
+			if (len(args) <= 2):
+				print(f"{COLOR.RED}Please specify a port{COLOR.WHITE}")
+				continue
+
+			if (not args[2].isdecimal()):
+				print(f"{COLOR.RED}Not a number{COLOR.WHITE}")
+				continue
+
+			port = int(args[2])
+
+			monitorPortThread = threading.Thread(target=MonitorPort, args=[port])
+			monitoringPort = True
+			monitorPortThread.start()
+
+			input("Press ENTER to stop monitoring")
+
+			monitoringPort = False
+			monitorPortThread.join()
 
 # game mechanics
 def PowerUpdate():
@@ -633,9 +651,14 @@ def AddXP(addXP, reason = "Failure fixed"):
 				mails.append(CreateMail("tier2"))
 
 def MonitorPort(port):
-	pass
+	port = ports[port - 1]
 
-
+	while monitoringPort:
+		if (port.data != ""):
+			print(f"[{port.connection.ip} -> {port.internalConnection.ip}] {port.data}")
+		if (port.internalData != ""):
+			print(f"[{port.internalConnection.ip} -> {port.connection.ip}] {port.data}")
+		time.sleep(1)
 
 # utility functions
 def IsFailure(failureName):
@@ -720,6 +743,8 @@ for i in range(1024):
 ports[0].Open()
 ports[0].ConnectInternal(Connection("192.168.2.205", ""))
 ports[0].Connect(Connection("243.8.98.102", ""))
+ports[0].Connect(test("24.4.4.2"))
+
 
 powerUpdate = threading.Thread(target=PowerUpdate)
 failureUpdate = threading.Thread(target=FailureUpdate)
