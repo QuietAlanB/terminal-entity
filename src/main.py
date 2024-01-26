@@ -420,7 +420,7 @@ def Network():
 			print("CONNECTIONS:")
 			if (not port.open): print(f"    Port closed")
 			elif (port.internalConnection == None): print(f"    No internal IP connected")
-			elif (port.state == "IDLE"): print(f"    {port.internalConnection.ip} <-> NO EXT. CONNECTION")
+			elif (port.state == "LISTENING"): print(f"    {port.internalConnection.ip} <-> NO EXT. CONNECTION")
 			else: print(f"    {port.internalConnection.ip} <-> {port.connection.ip}")
 
 		# view all ports of a certain type
@@ -440,6 +440,7 @@ def Network():
 				if (portType == "open" and port.open):
 					print(f"PORT {port.num} | {port.state} | ", end="")
 					if (port.state == "NOT_BOUND"): print(f"No internal IP connected")
+					elif (port.state == "LISTENING"): print(f"{port.internalConnection.ip} <-")
 					else: print(f"{port.internalConnection.ip} <-> {port.connection.ip}")
 
 				elif (portType == "closed" and not port.open):
@@ -553,14 +554,7 @@ def FailureUpdate():
 		for failure in failures:
 			if (failure.name == "CONTAINMENT_ERROR" and failure.breach):
 				failure.breach = False
-				addedFailure = AddFailure(random.choice(failureTypes))
-
-				maxIteration = 200
-				while (not addedFailure):
-					addedFailure = AddFailure(random.choice(failureTypes))
-					maxIteration -= 1
-
-					if (maxIteration == 0): break
+				AddRandomFailure(200)
 
 			if (failure.name == "COOLER_ERROR" and failure.explode):
 				failure.explode = False
@@ -630,6 +624,12 @@ def UpgradeUpdate():
 def PortUpdate():
 	while True:
 		for port in ports:
+			if (type(port.connection) == Bug):
+				attack = port.connection
+				if (attack.complete): 
+					AddRandomFailure(100)
+					attack.complete = False
+
 			port.Update()
 			
 		time.sleep(1)
@@ -702,19 +702,13 @@ def GetFailure(failureName):
 			return failure
 	return None
 
-# returns True if successfully added
-# return False if not added
 def AddFailure(failureType):
-	if (GetFailure(failureType.name) != None):
-		return False
-
 	chars = "ABCDEF0123456789"
 	f = copy.deepcopy(failureType)
 	f.code = ""
 	for i in range(random.randint(6, 10)):
 		f.code += random.choice(chars)
 	failures.append(f)
-	return True
 
 def CreateMail(filename):
 	file = open(f"res/mail/{filename}.txt", "r")
@@ -739,6 +733,18 @@ def GetUpgrade(name):
 
 def GetPort(num):
 	return ports[num - 1]
+
+def AddRandomFailure(maxIterations):
+	failure = random.choice(failureTypes)
+
+	while (IsFailure(failure)):
+		failure = random.choice(failureTypes)
+		maxIterations -= 1
+
+		if (maxIterations == 0): break
+
+	AddFailure(failure)
+
 
 endGame = False
 
@@ -769,6 +775,9 @@ for i in range(1024):
 		Port(i + 1, False, "", None, None)
 	)
 
+ports[0].internalConnection = Connection("10.63.201.4", "")
+ports[0].connection = Bug("145.98.2.78")
+ports[0].Open()
 
 powerUpdate = threading.Thread(target=PowerUpdate)
 failureUpdate = threading.Thread(target=FailureUpdate)
