@@ -1,4 +1,5 @@
 import time
+import random
 
 class Port:
 	def __init__(self, num, open, state, internalConnection = None, connection = None):
@@ -97,3 +98,87 @@ class Bug(Connection):
 			self.SendData("upload heartbeat recieved. restarting.")
 			self.complete = True
 			self.time = 60
+
+class FIX_KILL(Connection):
+	def __init__(self, ip):
+		super().__init__(ip, "")
+		self.time = 20
+		self.uploaded = False
+		self.started = False
+		self.fixKill = False
+		
+	def Update(self, port):
+		self.time -= 1
+
+		# first phase, uploading
+		if (not self.uploaded):
+			self.SendData(f"uploading FKILL.p [ {20 * 67282 - self.time * 67282} / {19 * 67282} ]")
+
+		# second phase, beginning the kill process
+		if (self.time == 0 and not self.uploaded and not self.started):
+			self.uploaded = True
+			self.time = 10
+			self.SendData(f"FKILL.p uploaded, begin transmit() process")
+			return
+		
+		# addition on to second phase where it prints this to the port
+		# monitor every second
+		if (self.time >= 0 and self.uploaded and not self.started):
+			num = random.randint(34, 156)
+			self.SendData(f"transmit() -> {num}")
+
+			if (self.time == 0):
+				self.started = True
+
+		# final phase where it starts sending the pulses
+		if (self.time == 0 and self.started):
+			self.time = 5
+			self.fixKill = True
+			self.SendData(f"transmitting kill pulse at 13hz...")
+			return
+		
+		# time in between the "pulses"
+		if (self.time > 0 and self.started):
+			# equation to get the "count" before it restarts the pulse
+			# look i can def make this cleaner i just cant be asked
+			count = self.time - (6 - self.time) + -6 + 3 * (6 - self.time)
+
+			self.SendData(f"restarting pulse [{count - 1}/4]")
+
+class POWER_FEEDER(Connection):
+	def __init__(self, ip):
+		super().__init__(ip, "")
+		self.time = 50
+		self.uploaded = False
+
+	def Update(self, port):
+		if (self.time > -1): self.time -= 1
+
+		if (self.time == 0 and not self.uploaded):
+			self.uploaded = True
+			self.SendData(f"ATTACHED TO PWS_{port.num}_2K, POWER DRAINING STARTED")
+
+		elif (self.time > 0 and not self.uploaded):
+			self.SendData(f"ATTACHING TO PWS_{port.num}_2K ETA: {self.time}")
+
+		else:
+			volts = random.uniform(4, 23.5)
+			self.SendData(f"DRAIN: V={volts} A=4.0 CURRENT=DC")
+
+class DOOR_SHUTDOWN(Connection):
+	def __init__(self, ip):
+		super().__init__(ip, "")
+		self.time = 60
+		self.amount = random.randint(6, 10)
+
+	def Update(self, port):
+		if (self.time > -1): self.time -= 1
+		
+		if (self.time > 0):
+			self.SendData(f"Injecting DOOR_SYS_OVERRIDE.p ...")
+
+		elif (self.time == 0):
+			self.SendData(f"Overloading injected software... {self.amount} softwares overloaded.")
+
+		else:
+			self.SendData(f"Injected software heartbeat recieved, attempting to spread...")

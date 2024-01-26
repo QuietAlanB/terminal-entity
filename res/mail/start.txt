@@ -2,11 +2,11 @@ Dr. Dan
 Initialization
 
 Good morning.
-As discussed earlier, you've been successfully connected to KILO-CHARLIE-7's power supply which includes access to most on-site systems. 
+As discussed earlier, you've been successfully connected to KILO-CHARLIE-7's systems through your power supply.
 You've also been connected to the site's network. You will unlock access to more on-site systems with completed tasks.
 Ensure that the facility is always operational.
 
-Please input 'request help.txt' to get started.
+Please input 'request help.txt' into your terminal to get started.
 
 Thank you,
 Dr. Dan

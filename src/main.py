@@ -237,6 +237,10 @@ def Fix(code):
 	if (power < failure.cost):
 		print(f"{COLOR.RED}Not enough power ({failure.cost} needed) {COLOR.WHITE}")
 		return
+	
+	if (GetCyberattack(FIX_KILL)):
+		print(f"{COLOR.RED}RklYIEVSUk9SIEVSUk9SIENPREUgTk9UIEZPVU5E{COLOR.WHITE}")
+		return
 
 	power -= failure.cost
 	fixed = failure.Puzzle()
@@ -375,6 +379,10 @@ def Network():
 		networkInput = input("Network >> ")
 		args = networkInput.split(" ")
 
+		if (IsFailure(NO_CONNECTION(""))):
+			print(f"{COLOR.RED}NO_CONNECTION, CODE {failure.code}{COLOR.WHITE}")
+			break
+
 		if (args[0].lower() in ["exit", "leave"]):
 			break
 
@@ -453,6 +461,9 @@ def Network():
 						
 		# open / close / disconnect a specific port
 		elif (args[1].lower() in ["open", "close", "disconnect", "dc"]):
+			if (len(args) <= 2):
+				print(f"{COLOR.RED}No port specified{COLOR.WHITE}")
+			
 			if (not args[2].isdecimal()):
 				print(f"{COLOR.RED}Not a number{COLOR.WHITE}")
 				continue
@@ -464,17 +475,23 @@ def Network():
 			action = args[1].lower()
 			port = ports[int(args[2]) - 1]
 
-			if (action == "open"): port.Open()
-			if (action == "close"): port.Close()
-			if (action in ["dc", "disconnect"]): port.Disconnect()
-			
+			if (action == "open"): 
+				port.Open()
+				print(f"Port {port.num} opened")
+			if (action == "close"): 
+				port.Close()
+				print(f"Port {port.num} closed")
+			if (action in ["dc", "disconnect"]): 
+				print(f"Port {port.num} disconnected, disconnected {port.connection.ip}")
+				port.Disconnect()
+
 		elif (args[1].lower() == "scan"):
 			# finish when i have actual dangers from the network
 			pass
 
 		elif (args[1].lower() == "monitor"):
 			if (len(args) <= 2):
-				print(f"{COLOR.RED}Please specify a port{COLOR.WHITE}")
+				print(f"{COLOR.RED}No port specified{COLOR.WHITE}")
 				continue
 
 			if (not args[2].isdecimal()):
@@ -540,12 +557,18 @@ def PowerUpdate():
 				regen *= 0.8
 			else:
 				regen *= 0.6
-
+			
+		powerFeeder = GetCyberattack(POWER_FEEDER)
+		if (powerFeeder != None):
+			if (powerFeeder.uploaded):
+				print("a")
+				regen *= 0.75
+				
 		time.sleep(regen)
 
 def FailureUpdate():
 	global endGame
-	global gracePeriod 
+	global grace
 
 	while True:
 		if (endGame): break
@@ -554,7 +577,7 @@ def FailureUpdate():
 		for failure in failures:
 			if (failure.name == "CONTAINMENT_ERROR" and failure.breach):
 				failure.breach = False
-				AddRandomFailure(200)
+				AddRandomFailure(100)
 
 			if (failure.name == "COOLER_ERROR" and failure.explode):
 				failure.explode = False
@@ -563,9 +586,9 @@ def FailureUpdate():
 
 			failure.Update()
 
-		# 30 seconds given at the start of the game
-		if (gracePeriod > 0):
-			gracePeriod -= 1
+		# player needs to input 'request help.txt' to end grace period
+		if (grace):
+			grace = False
 			time.sleep(1)
 			continue
 
@@ -593,9 +616,9 @@ def FailureUpdate():
 				chance = int(chance * 0.4)
 
 			if (failure.name == "NO_CONNECTION" and IsFailure("NETWORK_PROBLEM")):
-				chance = int(chance * 0.2)
+				chance = int(chance * 0.3)
 			if (failure.name == "FIREWALL_ERROR" and IsFailure("NETWORK_PROBLEM")):
-				chance = int(chance * 0.2)
+				chance = int(chance * 0.3)
 
 			randNum = random.randint(1, chance)
 			
@@ -623,12 +646,24 @@ def UpgradeUpdate():
 		
 def PortUpdate():
 	while True:
+		if (accessTier < 3):
+			continue
+
 		for port in ports:
 			if (type(port.connection) == Bug):
 				attack = port.connection
 				if (attack.complete): 
 					AddRandomFailure(100)
 					attack.complete = False
+
+			if (type(port.connection) == POWER_FEEDER):
+				if (port.connection.time == 0):
+					CheckAddFailure(REAC_FAILURE(""))
+					CheckAddFailure(POWER_FAILURE(""))
+
+			if (type(port.connection) == DOOR_SHUTDOWN):
+				if (port.connection.time == 0):
+					for i in range(port.connection.amount): AddFailure(DOOR_FAILURE)
 
 			port.Update()
 			
@@ -710,6 +745,24 @@ def AddFailure(failureType):
 		f.code += random.choice(chars)
 	failures.append(f)
 
+# same as above, but cant add duplicate failures
+def CheckAddFailure(failureType):
+	if (IsFailure(failureType.name)):
+		return
+	
+	AddFailure(failureType)
+
+def AddRandomFailure(maxIterations):
+	failure = random.choice(failureTypes)
+
+	while (IsFailure(failure.name)):
+		failure = random.choice(failureTypes)
+		maxIterations -= 1
+
+		if (maxIterations == 0): break
+
+	AddFailure(failure)
+
 def CreateMail(filename):
 	file = open(f"res/mail/{filename}.txt", "r")
 	lines = file.readlines()
@@ -734,27 +787,23 @@ def GetUpgrade(name):
 def GetPort(num):
 	return ports[num - 1]
 
-def AddRandomFailure(maxIterations):
-	failure = random.choice(failureTypes)
-
-	while (IsFailure(failure)):
-		failure = random.choice(failureTypes)
-		maxIterations -= 1
-
-		if (maxIterations == 0): break
-
-	AddFailure(failure)
+def GetCyberattack(cyberattackType):
+	for port in ports:
+		if (type(port.connection) == cyberattackType):
+			return port.connection
+		
+	return None
 
 
 endGame = False
 
-gracePeriod = 30
+grace = True
 
 power = 100
 maxPower = 100
 xp = 0
 maxXP = 100
-accessTier = 3
+accessTier = 1
 powerRegen = 2 # the higher this is, the slower it is
 	       # (seconds between power regens)
 
@@ -775,9 +824,9 @@ for i in range(1024):
 		Port(i + 1, False, "", None, None)
 	)
 
-ports[0].internalConnection = Connection("10.63.201.4", "")
-ports[0].connection = Bug("145.98.2.78")
-ports[0].Open()
+#ports[0].internalConnection = Connection("10.63.201.4", "")
+#ports[0].connection = DOOR_SHUTDOWN("24.65.2.252")
+#ports[0].Open()
 
 powerUpdate = threading.Thread(target=PowerUpdate)
 failureUpdate = threading.Thread(target=FailureUpdate)
@@ -840,11 +889,16 @@ while True:
 			continue
 
 		filePath = "res/files/" + args[1]
+
 		try:
 			file = open(filePath, "r")
 		except FileNotFoundError:
 			print(f"{COLOR.RED}File doesn't exist{COLOR.WHITE}")
 			continue
+		except OSError:
+			print(f"{COLOR.RED}File doesn't exist{COLOR.WHITE}")
+			continue
+
 		print("---------------------------")
 		print(file.read())
 		print("---------------------------")
@@ -859,6 +913,10 @@ while True:
 		gracePeriod = 0
 
 	elif (args[0].lower() == "network" and accessTier >= 3):
+		if (IsFailure(NO_CONNECTION(""))):
+			print(f"{COLOR.RED}NO_CONNECTION, CODE {failure.code}{COLOR.WHITE}")
+			continue
+
 		Network()
 
 print("GAME ENDED")

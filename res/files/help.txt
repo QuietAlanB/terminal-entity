@@ -28,3 +28,6 @@ You wont be able to access most of the files from the servers, but you will be g
 
 This will be all you need up until access tier 2.
 Make sure to frequently check your mail for any new information.
+
+
+- Written by Dr. Gav
