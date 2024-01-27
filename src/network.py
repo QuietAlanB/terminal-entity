@@ -1,5 +1,6 @@
 import time
 import random
+from color import COLOR
 
 class Port:
 	def __init__(self, num, open, state, internalConnection = None, connection = None):
@@ -83,7 +84,7 @@ class Connection:
 
 # custom AI for connections
 # cyberattacks
-class Bug(Connection):
+class BUG(Connection):
 	def __init__(self, ip):
 		super().__init__(ip, "")
 		self.time = 60
@@ -182,3 +183,92 @@ class DOOR_SHUTDOWN(Connection):
 
 		else:
 			self.SendData(f"Injected software heartbeat recieved, attempting to spread...")
+
+class OVERLOADER(Connection):
+	def __init__(self, ip):
+		super().__init__(ip, "")
+		self.time = 80
+		self.phase = 0
+
+	def Update(self, port):
+		self.time -= 1
+
+		if (self.time > 0 and self.phase == 0):
+			self.SendData(f"UPLOADING OVERLOADER... {self.time}s")
+
+		elif (self.time == 0 and self.phase == 0):
+			self.phase = 1
+			self.SendData(f"OVERLOADER UPLOADED.")
+			return
+		
+		if (self.phase == 1):
+			self.SendData(f"OVERLOADER HEARTBEAT RECIEVED. BEGINNING OVERLOAD.")
+			self.phase = 2
+			self.time = 60
+
+		if (self.phase == 2):
+			self.SendData(f"WAITING FOR SUCCESS PACKET...")
+
+		if (self.phase == 2 and self.time == 0):
+			self.SendData(f"SUCCESS.")
+			self.phase = 3
+
+class CORRUPTOR(Connection):
+	def __init__(self, ip):
+		super().__init__(ip, "")
+		self.time = 180
+		self.phase = 0
+
+	def Update(self, port):
+		if (self.time > 0): self.time -= 1
+
+		self.SendData(f"CORRUPTING SERVER DATA. CORRUPTING POWER {self.phase}")
+		
+		if (self.time == 150):
+			self.phase = 1
+			self.SendData(f"INCREASING CORRUPTING POWER")
+		if (self.time == 100):
+			self.phase = 2
+			self.SendData(f"INCREASING CORRUPTING POWER")
+		if (self.time == 60):
+			self.phase = 3
+			self.SendData(f"INCREASING CORRUPTING POWER")
+		if (self.time == 30):
+			self.phase = 4
+			self.SendData(f"INCREASING CORRUPTING POWER")
+		if (self.time == 0):
+			self.phase = 5
+			self.SendData(f"CORRUPTING SERVER DATA. MAX CORRUPTION POWER REACHED.")
+
+class BAIT(Connection):
+	def __init__(self, ip):
+		super().__init__(ip, "")
+		
+	def Update(self, port):
+		self.SendData(f"SITE TERMINAL MANAGER FOUND, EXECUTING drain() siphon()")
+
+class BREACHER(Connection):
+	def __init__(self, ip):
+		super().__init__(ip, "")
+		self.time = 70	
+		self.amount = random.randint(3, 5)
+
+	def Update(self, port):
+		if (self.time > -1): self.time -= 1
+
+		if (self.time > 0):
+			self.SendData("FINDING CONTAINMENT CHAMBERS...")
+		elif (self.time == 0):
+			self.SendData(f"FOUND {self.amount} CONTAINMENT CHAMBERS. BEGINNING ERROR SEQUENCE.")
+
+class KILLBOT(Connection):
+	def __init__(self, ip):
+		super().__init__(ip, "")
+		self.time = 15
+
+	def Update(self, port):
+		if (self.time > -1): self.time -= 1
+
+		if (self.time > 0):
+			self.SendData("Uploading KILLBOT.exe...")
+		elif (self.time == 0): self.SendData(f"{COLOR.RED}KLLBOT.EXE{COLOR.WHITE}")

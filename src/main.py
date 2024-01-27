@@ -225,6 +225,14 @@ def Fix(code):
 	global power
 	global xp
 
+	# for KILLBOT cyberattack
+	if (code.upper() == "KILLBOT.EXE"):
+		print(f"{COLOR.RED}Code not found{COLOR.WHITE}")
+		return
+	if (code.upper() == f"{COLOR.RED}KILLBOT.EXE{COLOR.WHITE}"):
+		print(f"{COLOR.RED}yeah nice try{COLOR.WHITE}")
+		return
+
 	failure = None
 	for failure_ in failures:
 		if (failure_.code == code.upper()):
@@ -374,16 +382,22 @@ def UpgradeSystem():
 
 def Network():
 	global monitoringPort
-	
-	while True:
+	global networkInterface
+
+	networkInterface = True
+
+	while networkInterface:
+		if (IsFailure("NO_CONNECTION")):
+			failure = GetFailure("NO_CONNECTION")
+			print(f"{COLOR.RED}NO_CONNECTION, CODE {failure.code}{COLOR.WHITE}")
+			networkInterface = False
+			break
+
 		networkInput = input("Network >> ")
 		args = networkInput.split(" ")
 
-		if (IsFailure(NO_CONNECTION(""))):
-			print(f"{COLOR.RED}NO_CONNECTION, CODE {failure.code}{COLOR.WHITE}")
-			break
-
 		if (args[0].lower() in ["exit", "leave"]):
+			networkInterface = False
 			break
 
 		elif (args[0].lower() != "port"):
@@ -478,9 +492,20 @@ def Network():
 			if (action == "open"): 
 				port.Open()
 				print(f"Port {port.num} opened")
-			if (action == "close"): 
+				
+			if (action == "close"):
+				connection = port.connection
 				port.Close()
 				print(f"Port {port.num} closed")
+
+				if (type(connection) == BAIT):
+					AddFailure(NO_CONNECTION(""))
+					failure = GetFailure("NO_CONNECTION")
+					print(f"{COLOR.RED}NO_CONNECTION ERROR, CODE {failure.code}{COLOR.WHITE}")
+					
+					networkInterface = False
+					break
+
 			if (action in ["dc", "disconnect"]): 
 				print(f"Port {port.num} disconnected, disconnected {port.connection.ip}")
 				port.Disconnect()
@@ -514,6 +539,40 @@ def Network():
 
 			monitoringPort = False
 			monitorPortThread.join()
+
+def Request(fileName):
+	if (IsFailure("NO_CONNECTION")):
+		failure = GetFailure("NO_CONNECTION")
+		print(f"{COLOR.RED}NO_CONNECTION, CODE {failure.code}{COLOR.WHITE}")
+		return
+
+	if (IsFailure("SERVER_ERROR")):
+		failure = GetFailure("SERVER_ERROR")
+		print(f"{COLOR.RED}SERVER_ERROR, CODE {failure.code}{COLOR.WHITE}")
+		return
+
+	filePath = "res/files/" + fileName
+
+	try:
+		file = open(filePath, "r")
+	except FileNotFoundError:
+		print(f"{COLOR.RED}File doesn't exist{COLOR.WHITE}")
+		return
+	except OSError:
+		print(f"{COLOR.RED}File doesn't exist{COLOR.WHITE}")
+		return
+
+	text = file.read()	
+
+	corruptor = GetCyberattack(CORRUPTOR)
+	if (corruptor != None):
+		corruptAmountLUT = (0, 0.01, 0.05, 0.15, 0.3, 0.8)
+		text = CorruptText(text, corruptAmountLUT[corruptor.phase])
+
+	print("---------------------------")	
+	print(text)
+	print("---------------------------")
+	file.close()
 
 # game mechanics
 def PowerUpdate():
@@ -557,13 +616,28 @@ def PowerUpdate():
 				regen *= 0.8
 			else:
 				regen *= 0.6
-			
+
+		# cyberattacks that effect power gain	
 		powerFeeder = GetCyberattack(POWER_FEEDER)
+		overLoader = GetCyberattack(OVERLOADER)
 		if (powerFeeder != None):
 			if (powerFeeder.uploaded):
 				print("a")
-				regen *= 0.75
-				
+				regen *= 1.35
+
+		if (overLoader != None):
+			if (overLoader.phase >= 1):
+				regen *= 0.5
+				preventFailures = [
+					"REAC_FAILURE",
+					"BACKUP_REAC_FAILURE",
+					"COOLER_ERROR"
+		       			]
+			
+				for failure in preventFailures:
+					curFailure = GetFailure(failure)
+					if (curFailure != None): failures.remove(curFailure)
+
 		time.sleep(regen)
 
 def FailureUpdate():
@@ -645,25 +719,65 @@ def UpgradeUpdate():
 		time.sleep(1)
 		
 def PortUpdate():
+	global endGame
+	global xp
+	global monitoringPort
+	global networkInterface
+
 	while True:
 		if (accessTier < 3):
 			continue
 
 		for port in ports:
-			if (type(port.connection) == Bug):
+			if (type(port.connection) == BUG):
 				attack = port.connection
 				if (attack.complete): 
 					AddRandomFailure(100)
 					attack.complete = False
 
-			if (type(port.connection) == POWER_FEEDER):
+			elif (type(port.connection) == POWER_FEEDER):
 				if (port.connection.time == 0):
 					CheckAddFailure(REAC_FAILURE(""))
 					CheckAddFailure(POWER_FAILURE(""))
 
-			if (type(port.connection) == DOOR_SHUTDOWN):
+			elif (type(port.connection) == DOOR_SHUTDOWN):
 				if (port.connection.time == 0):
 					for i in range(port.connection.amount): AddFailure(DOOR_FAILURE)
+
+			elif (type(port.connection) == OVERLOADER):
+				if (port.connection.phase == 2):
+					if (port.connection.time == 59): print(f"{COLOR.RED}WARNING! NUCLEAR REACTOR OVERLOAD DETECTED. RESOLVE IMMEDIATELY! {COLOR.WHITE}")
+					if (port.connection.time == 25): print(f"{COLOR.RED}WARNING! NUCLEAR REACTOR IN CRITICAL STATE. RESOLVE IMMEDIATELY! {COLOR.WHITE}")
+					if (port.connection.time == 5): print(f"{COLOR.RED}WARNING! NUCLEAR REACTOR MELTDOWN IMMINENT. EVACUATE. {COLOR.WHITE}")
+
+				if (port.connection.phase == 3):
+					endGame = True
+
+			elif (type(port.connection) == BAIT):
+				xp -= 2
+				if (xp < 0):
+					xp = 0
+
+			elif (type(port.connection) == BREACHER):
+				if (port.connection.time == 0):
+					for i in range(port.connection.amount): 
+						AddFailure(CONTAINMENT_ERROR(""))
+				
+				if (port.connection.time == 0):
+					port.Disconnect()
+					monitoringPort = False
+					continue
+
+			elif (type(port.connection) == KILLBOT):
+				if (port.connection.time == 0):
+					port.Disconnect()
+					monitoringPort = False
+					networkInterface = False
+
+					AddFailure(NO_CONNECTION(""))
+					failures[len(failures) - 1].code = f"{COLOR.RED}KILLBOT.EXE{COLOR.WHITE}"
+					print(f"{COLOR.RED}NO_CONNECTION ERROR{COLOR.WHITE}")
+					break
 
 			port.Update()
 			
@@ -794,6 +908,26 @@ def GetCyberattack(cyberattackType):
 		
 	return None
 
+def CorruptText(text, corruptAmount):
+	chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()[]{}/|\\'\"+_-="
+	textList = []
+	doneIndexes = []
+
+	for char in text:
+		textList.append(char)
+
+	maxIndex = len(text) - 1
+	corruptChars = int(len(text) * corruptAmount)
+
+	for i in range(corruptChars):
+		randomIndex = random.randint(0, maxIndex)
+		textList[randomIndex] = random.choice(chars)
+
+	text = ""
+	for char in textList:
+		text += char
+
+	return text
 
 endGame = False
 
@@ -801,7 +935,7 @@ grace = True
 
 power = 100
 maxPower = 100
-xp = 0
+xp = 100
 maxXP = 100
 accessTier = 1
 powerRegen = 2 # the higher this is, the slower it is
@@ -817,16 +951,13 @@ upgrades = [
 	Upgrade("Construction System", 1, [100, 110], [60, 150], [3, 4])
 ]
 
+networkInterface = False
 monitoringPort = False
 ports = []
 for i in range(1024):
 	ports.append(
 		Port(i + 1, False, "", None, None)
 	)
-
-#ports[0].internalConnection = Connection("10.63.201.4", "")
-#ports[0].connection = DOOR_SHUTDOWN("24.65.2.252")
-#ports[0].Open()
 
 powerUpdate = threading.Thread(target=PowerUpdate)
 failureUpdate = threading.Thread(target=FailureUpdate)
@@ -874,35 +1005,11 @@ while True:
 		Mails()
 
 	elif (args[0].lower() in ["req", "request"]):
-		if (IsFailure("NO_CONNECTION")):
-			failure = GetFailure("NO_CONNECTION")
-			print(f"{COLOR.RED}NO_CONNECTION, CODE {failure.code}{COLOR.WHITE}")
-			continue
-
-		if (IsFailure("SERVER_ERROR")):
-			failure = GetFailure("SERVER_ERROR")
-			print(f"{COLOR.RED}SERVER_ERROR, CODE {failure.code}{COLOR.WHITE}")
-			continue
-	
 		if (len(args) <= 1):
 			print(f"{COLOR.RED}No file specified{COLOR.WHITE}")
 			continue
 
-		filePath = "res/files/" + args[1]
-
-		try:
-			file = open(filePath, "r")
-		except FileNotFoundError:
-			print(f"{COLOR.RED}File doesn't exist{COLOR.WHITE}")
-			continue
-		except OSError:
-			print(f"{COLOR.RED}File doesn't exist{COLOR.WHITE}")
-			continue
-
-		print("---------------------------")
-		print(file.read())
-		print("---------------------------")
-		file.close()
+		Request(args[1])
 
 	# upgrading is explained in my document, but this will allow
 	# the player to upgrade some systems (like the scanner)
@@ -913,7 +1020,8 @@ while True:
 		gracePeriod = 0
 
 	elif (args[0].lower() == "network" and accessTier >= 3):
-		if (IsFailure(NO_CONNECTION(""))):
+		if (IsFailure("NO_CONNECTION")):
+			failure = GetFailure("NO_CONNECTION")
 			print(f"{COLOR.RED}NO_CONNECTION, CODE {failure.code}{COLOR.WHITE}")
 			continue
 

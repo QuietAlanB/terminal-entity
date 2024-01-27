@@ -341,7 +341,7 @@ class CONSTRUCT_SYS_FAILURE(Failure):
 class CONTAINMENT_ERROR(Failure):
 	def __init__(self, code):
 		super().__init__("CONTAINMENT_ERROR", code, 15, 50, 105)
-		self.time = random.randint(30, 50)
+		self.time = random.randint(60, 90)
 		self.breach = False
 
 	def Puzzle(self):
