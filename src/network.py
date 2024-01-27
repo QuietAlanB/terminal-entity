@@ -70,9 +70,10 @@ class Port:
 # use this class as a super class, then change the behaviour
 # in the Update() function
 class Connection:
-	def __init__(self, ip, data):
+	def __init__(self, ip, data, chance = 0):
 		self.ip = ip
 		self.data = data
+		self.chance = chance  # works the same as failures
 
 	def SendData(self, data):
 		self.data = data
@@ -86,7 +87,7 @@ class Connection:
 # cyberattacks
 class BUG(Connection):
 	def __init__(self, ip):
-		super().__init__(ip, "")
+		super().__init__(ip, "", 240)
 		self.time = 60
 		self.complete = False
 		
@@ -102,7 +103,7 @@ class BUG(Connection):
 
 class FIX_KILL(Connection):
 	def __init__(self, ip):
-		super().__init__(ip, "")
+		super().__init__(ip, "", 290)
 		self.time = 20
 		self.uploaded = False
 		self.started = False
@@ -148,7 +149,7 @@ class FIX_KILL(Connection):
 
 class POWER_FEEDER(Connection):
 	def __init__(self, ip):
-		super().__init__(ip, "")
+		super().__init__(ip, "", 330)
 		self.time = 50
 		self.uploaded = False
 
@@ -168,7 +169,7 @@ class POWER_FEEDER(Connection):
 
 class DOOR_SHUTDOWN(Connection):
 	def __init__(self, ip):
-		super().__init__(ip, "")
+		super().__init__(ip, "", 310)
 		self.time = 60
 		self.amount = random.randint(6, 10)
 
@@ -186,7 +187,7 @@ class DOOR_SHUTDOWN(Connection):
 
 class OVERLOADER(Connection):
 	def __init__(self, ip):
-		super().__init__(ip, "")
+		super().__init__(ip, "", 280)
 		self.time = 80
 		self.phase = 0
 
@@ -215,7 +216,7 @@ class OVERLOADER(Connection):
 
 class CORRUPTOR(Connection):
 	def __init__(self, ip):
-		super().__init__(ip, "")
+		super().__init__(ip, "", 210)
 		self.time = 180
 		self.phase = 0
 
@@ -249,7 +250,7 @@ class BAIT(Connection):
 
 class BREACHER(Connection):
 	def __init__(self, ip):
-		super().__init__(ip, "")
+		super().__init__(ip, "", 430)
 		self.time = 70	
 		self.amount = random.randint(3, 5)
 
@@ -263,7 +264,7 @@ class BREACHER(Connection):
 
 class KILLBOT(Connection):
 	def __init__(self, ip):
-		super().__init__(ip, "")
+		super().__init__(ip, "", 600)
 		self.time = 15
 
 	def Update(self, port):
@@ -272,3 +273,16 @@ class KILLBOT(Connection):
 		if (self.time > 0):
 			self.SendData("Uploading KILLBOT.exe...")
 		elif (self.time == 0): self.SendData(f"{COLOR.RED}KLLBOT.EXE{COLOR.WHITE}")
+
+# BAIT is not included in this list because it is
+# transmitted by email
+cyberattacks = [
+	BUG(""),
+	FIX_KILL(""),
+	POWER_FEEDER(""),
+	DOOR_SHUTDOWN(""),
+	OVERLOADER(""),
+	CORRUPTOR(""),
+	BREACHER(""),
+	KILLBOT("")
+]

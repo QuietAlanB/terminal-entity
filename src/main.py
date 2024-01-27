@@ -491,12 +491,12 @@ def Network():
 
 			if (action == "open"): 
 				port.Open()
-				print(f"Port {port.num} opened")
+				print(f"{COLOR.LIGHTGREEN}Port {port.num} opened{COLOR.WHITE}")
 				
 			if (action == "close"):
 				connection = port.connection
 				port.Close()
-				print(f"Port {port.num} closed")
+				print(f"{COLOR.RED}Port {port.num} closed{COLOR.WHITE}")
 
 				if (type(connection) == BAIT):
 					AddFailure(NO_CONNECTION(""))
@@ -729,6 +729,21 @@ def PortUpdate():
 			continue
 
 		for port in ports:
+			# for opening / closing ports automatically
+			if (not port.open):
+				randNum = random.randint(1, 25000)
+				if (randNum == 1):
+					ip = GenerateIP()
+					port.ConnectInternal(Connection(ip, ""))		
+					port.Open()
+
+			elif (port.open):
+				randNum = random.randint(1, 19000)
+				if (randNum == 1):
+					if (random.randint(1, 4) == 1): port.Close()
+					port.internalConnection = None
+
+			# for cyberattack updating
 			if (type(port.connection) == BUG):
 				attack = port.connection
 				if (attack.complete): 
@@ -782,6 +797,35 @@ def PortUpdate():
 			port.Update()
 			
 		time.sleep(1)
+
+def CyberattackUpdate():
+	while True:
+		cyberattack = copy.deepcopy(random.choice(cyberattacks))
+		randNum = 0
+		if (cyberattack.chance >= 1):
+			chance = cyberattack.chance
+			randNum = random.randint(1, chance)
+			
+		if (randNum == 1):
+			port = random.choice(ports)
+			maxIterations = 1000
+
+			while (port.state != "LISTENING"):
+				port = random.choice(ports)
+				maxIterations -= 1
+				if (maxIterations == 0):
+					break
+
+			if (port.state != "LISTENING"):
+				time.sleep(1)
+				continue
+
+			ip = GenerateIP()
+
+			cyberattack.ip = ip
+			port.Connect(cyberattack)
+
+		time.sleep(1)	
 
 # used to manage leveling up
 def AddXP(addXP, reason = "Failure fixed"):
@@ -929,13 +973,20 @@ def CorruptText(text, corruptAmount):
 
 	return text
 
+def GenerateIP():
+	ipString = ""
+	for i in range(4):
+		ipString += str(random.randint(0, 255))
+		if (i != 3): ipString += "."	
+	return ipString
+
 endGame = False
 
 grace = True
 
 power = 100
 maxPower = 100
-xp = 100
+xp = 0
 maxXP = 100
 accessTier = 1
 powerRegen = 2 # the higher this is, the slower it is
@@ -963,10 +1014,12 @@ powerUpdate = threading.Thread(target=PowerUpdate)
 failureUpdate = threading.Thread(target=FailureUpdate)
 upgradeUpdate = threading.Thread(target=UpgradeUpdate)
 portUpdate = threading.Thread(target=PortUpdate)
+cyberattackUpdate = threading.Thread(target=CyberattackUpdate)
 powerUpdate.start()
 failureUpdate.start()
 upgradeUpdate.start()
 portUpdate.start()
+cyberattackUpdate.start()
 
 print("---------- SITE KILO-CHARLIE-7 MANAGEMENT TERMINAL ----------")
 print(f"{COLOR.BLUE}Please type 'mail' to view your current emails{COLOR.WHITE}")
@@ -1033,3 +1086,4 @@ powerUpdate.join()
 failureUpdate.join()
 upgradeUpdate.join()
 portUpdate.join()
+cyberattackUpdate.join()
