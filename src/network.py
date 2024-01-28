@@ -1,5 +1,6 @@
 import time
 import random
+from typing import Any
 from color import COLOR
 
 class Port:
@@ -56,13 +57,14 @@ class Port:
 		self.data = ""
 		self.internalData = ""
 
-		if (self.internalConnection != None):
-			self.internalConnection.Update(self)
-			self.internalData = self.internalConnection.data
-
 		if (self.connection != None):
 			self.connection.Update(self)
 			self.data = self.connection.data
+
+		
+		if (self.internalConnection != None):
+			self.internalConnection.Update(self)
+			self.internalData = self.internalConnection.data
 
 		self.UpdateState()
 		
@@ -82,6 +84,30 @@ class Connection:
 	# called by the port
 	def Update(self, port):
 		pass
+
+# custom AI for internal connections
+# NON MALICIOUS
+class ECHO(Connection):
+	def __init__(self, ip):
+		super().__init__(ip, "", 0)
+	
+	def Update(self, port):
+		if (port.data != ""):
+			self.SendData(f"ECHO: {port.data}")
+
+class BROADCAST(Connection):
+	def __init__(self, ip, broadcastText, interval):
+		super().__init__(ip, "", 0)
+		self.broadcastText = broadcastText
+		self.interval = interval
+		self.time = 0
+
+	def Update(self, port):
+		self.time -= 1
+
+		if (self.time == 0):
+			self.SendData(f"[BROADCAST] {self.broadcastText}")
+			self.time = self.interval
 
 # custom AI for connections
 # cyberattacks
