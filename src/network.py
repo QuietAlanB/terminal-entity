@@ -105,9 +105,34 @@ class BROADCAST(Connection):
 	def Update(self, port):
 		self.time -= 1
 
-		if (self.time == 0):
+		if (self.time <= 0):
 			self.SendData(f"[BROADCAST] {self.broadcastText}")
 			self.time = self.interval
+		else:
+			self.SendData("")
+
+# custom AI for external connections
+# NON MALICIOUS
+class REQUEST_FILE(Connection):
+	def __init__(self, ip, fileName, lifetime):
+		super().__init__(ip, "", 1)
+		self.time = lifetime
+		self.maxTime = lifetime
+		self.fileName = fileName
+		self.done = False
+		self.fileChunk = random.randint(3184, 9820)
+
+	def Update(self, port):
+		self.time -= 1
+
+		if (self.time == 0):
+			self.SendData(f"Download complete")
+			self.done = True
+		
+		if (not self.done and self.time > 0):
+			downloaded = (self.maxTime - self.time) * self.fileChunk
+			fileSize = self.maxTime * self.fileChunk
+			self.SendData(f"Downloading {self.fileName} ({downloaded} / {fileSize})")
 
 # custom AI for connections
 # cyberattacks
@@ -311,4 +336,8 @@ cyberattacks = [
 	CORRUPTOR(""),
 	BREACHER(""),
 	KILLBOT("")
+]
+
+safeConnections = [
+	REQUEST_FILE("", "", 0)
 ]

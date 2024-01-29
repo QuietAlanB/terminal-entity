@@ -477,7 +477,8 @@ def Network():
 		elif (args[1].lower() in ["open", "close", "disconnect", "dc"]):
 			if (len(args) <= 2):
 				print(f"{COLOR.RED}No port specified{COLOR.WHITE}")
-			
+				continue
+
 			if (not args[2].isdecimal()):
 				print(f"{COLOR.RED}Not a number{COLOR.WHITE}")
 				continue
@@ -729,14 +730,32 @@ def PortUpdate():
 			continue
 
 		for port in ports:
-			# for opening / closing ports automatically
+			# for opening ports automatically
 			if (not port.open):
 				randNum = random.randint(1, 25000)
 				if (randNum == 1):
 					ip = GenerateIP()
-					port.ConnectInternal(Connection(ip, ""))		
+
+					num = random.randint(1, 20)
+
+					if (num <= 15): port.ConnectInternal(Connection(ip, ""))
+					elif (num <= 17): 
+						broadcastMessage = random.choice(
+							[
+								"Don't forget to stay hydrated!",
+								"Reminder to ALWAYS contact your supervisors if you ever see suspicious activity!",
+								"Do not accept any suspicious emails! You WILL be at fault if any damage occurs."
+							]
+						)
+						interval = random.randint(10, 45)
+						port.ConnectInternal(BROADCAST(ip, broadcastMessage, interval))	
+
+					elif (num <= 20):
+						port.ConnectInternal(ECHO(ip))
+
 					port.Open()
 
+			# for closing ports automatically
 			elif (port.open):
 				randNum = random.randint(1, 19000)
 				if (randNum == 1):
@@ -794,12 +813,17 @@ def PortUpdate():
 					print(f"{COLOR.RED}NO_CONNECTION ERROR{COLOR.WHITE}")
 					break
 
+			elif (type(port.connection) == REQUEST_FILE):
+				if (port.connection.done):
+					port.Disconnect()
+
 			port.Update()
 			
 		time.sleep(1)
 
 def CyberattackUpdate():
 	while True:
+		# cyberattacks
 		cyberattack = copy.deepcopy(random.choice(cyberattacks))
 		randNum = 0
 		if (cyberattack.chance >= 1):
@@ -824,6 +848,45 @@ def CyberattackUpdate():
 
 			cyberattack.ip = ip
 			port.Connect(cyberattack)
+
+		# non malicious connections
+		connection = copy.deepcopy(random.choice(safeConnections))
+		randNum = 0
+		if (connection.chance >= 1):
+			chance = connection.chance
+			randNum = random.randint(1, chance)
+			
+		if (randNum == 1):
+			port = random.choice(ports)
+			maxIterations = 1000
+
+			while (port.state != "LISTENING"):
+				port = random.choice(ports)
+				maxIterations -= 1
+				if (maxIterations == 0):
+					break
+
+			if (port.state != "LISTENING"):
+				time.sleep(1)
+				continue
+
+			ip = GenerateIP()
+
+			connection.ip = ip
+			if (type(connection) == REQUEST_FILE):
+				fileNames = [
+					"note_a.txt",
+					"note_b.txt",
+					"note_c.txt",
+					"important_notice.txt",
+					"important_message.txt",
+					"ENT-080.txt",
+					"sharesystem.p",
+					"found.txt"
+				]
+				connection.fileName = random.choice(fileNames)
+				connection.lifetime = random.randint(40, 200)
+			port.Connect(connection)
 
 		time.sleep(1)	
 
@@ -876,10 +939,15 @@ def MonitorPort(port):
 	port = ports[port - 1]
 
 	while monitoringPort:
+		internalConnectionStr = "--"
+		if (port.internalConnection != None): internalConnectionStr = port.internalConnection.ip
+		connectionStr = "--"
+		if (port.connection != None): connectionStr = port.connection.ip
+
 		if (port.data != ""):
-			print(f"[{port.connection.ip} -> {port.internalConnection.ip}] {port.data}")
+			print(f"[{connectionStr} -> {internalConnectionStr}] {port.data}")
 		if (port.internalData != ""):
-			print(f"[{port.internalConnection.ip} -> {port.connection.ip}] {port.data}")
+			print(f"[{internalConnectionStr} -> {connectionStr}] {port.internalData}")
 		time.sleep(1)
 
 # utility functions
@@ -988,7 +1056,7 @@ power = 100
 maxPower = 100
 xp = 0
 maxXP = 100
-accessTier = 1
+accessTier = 5
 powerRegen = 2 # the higher this is, the slower it is
 	       # (seconds between power regens)
 
