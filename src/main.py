@@ -245,10 +245,6 @@ def Fix(code):
 	if (power < failure.cost):
 		print(f"{COLOR.RED}Not enough power ({failure.cost} needed) {COLOR.WHITE}")
 		return
-	
-	if (GetCyberattack(FIX_KILL)):
-		print(f"{COLOR.RED}RklYIEVSUk9SIEVSUk9SIENPREUgTk9UIEZPVU5E{COLOR.WHITE}")
-		return
 
 	power -= failure.cost
 	fixed = failure.Puzzle()
@@ -380,167 +376,6 @@ def UpgradeSystem():
 		# power failure causes systems to run slower
 		if (IsFailure("POWER_FAILURE")): upgrade.time *= 2
 
-def Network():
-	global monitoringPort
-	global networkInterface
-
-	networkInterface = True
-
-	while networkInterface:
-		if (IsFailure("NO_CONNECTION")):
-			failure = GetFailure("NO_CONNECTION")
-			print(f"{COLOR.RED}NO_CONNECTION, CODE {failure.code}{COLOR.WHITE}")
-			networkInterface = False
-			break
-
-		networkInput = input("Network >> ")
-		args = networkInput.split(" ")
-
-		if (args[0].lower() in ["exit", "leave"]):
-			networkInterface = False
-			break
-
-		elif (args[0].lower() != "port"):
-			continue
-
-		# all of the next code is for the "port" command
-		if (len(args) <= 1):
-			print(f"{COLOR.RED}Unknown arguments{COLOR.WHITE}")
-			continue
-
-		# view port
-		if (args[1].isdecimal()):
-			if (int(args[1]) > 1024):
-				print(f"{COLOR.RED}Port doesn't exist{COLOR.WHITE}")
-				continue
-
-			port = GetPort(int(args[1]))
-			print(f"PORT {port.num}")
-
-			openText = "OPEN"
-			stateText = port.state
-			if (not port.open): 
-				openText = "CLOSED"
-				stateText = "CLOSED"
-
-			openTextColorDict = {
-				"CLOSED": COLOR.RED,
-				"OPEN": COLOR.LIGHTGREEN
-			}
-
-			stateTextColorDict = {
-				"IDLE": COLOR.BLUE,
-				"LISTENING": COLOR.YELLOW,
-				"CONNECTED": COLOR.LIGHTGREEN,
-				"NOT_BOUND": COLOR.RED,
-				"CLOSED": COLOR.RED
-			}
-
-			print(f"{openTextColorDict[openText]}{openText}{COLOR.WHITE}, ", end="")
-			print(f"{stateTextColorDict[stateText]}{stateText}{COLOR.WHITE}")
-
-			print("CONNECTIONS:")
-			if (not port.open): print(f"    Port closed")
-			elif (port.internalConnection == None): print(f"    No internal IP connected")
-			elif (port.state == "LISTENING"): print(f"    {port.internalConnection.ip} <-> NO EXT. CONNECTION")
-			else: print(f"    {port.internalConnection.ip} <-> {port.connection.ip}")
-
-		# view all ports of a certain type
-		elif (args[1].lower() == "list"):
-			portType = "open"
-			if (len(args) >= 3):
-				portType = args[2].lower()
-
-			if (portType not in ["open", "closed", "connected", "idle", "listening", "not_bound"]):
-				print(f"{COLOR.RED}Invalid port type{COLOR.WHITE}")
-				continue
-
-			print(f"LIST OF {portType.upper()} PORTS:")
-
-			for port in ports:
-				# has code for a NOT_BOUND type port
-				if (portType == "open" and port.open):
-					print(f"PORT {port.num} | {port.state} | ", end="")
-					if (port.state == "NOT_BOUND"): print(f"No internal IP connected")
-					elif (port.state == "LISTENING"): print(f"{port.internalConnection.ip} <-")
-					else: print(f"{port.internalConnection.ip} <-> {port.connection.ip}")
-
-				elif (portType == "closed" and not port.open):
-					print(f"PORT {port.num} | CLOSED")
-
-				elif (portType.upper() == port.state):
-					print(f"PORT {port.num} | {port.state} | ", end="")
-					if (port.state == "NOT_BOUND"): print(f"No internal IP connected")
-					else: print(f"{port.internalConnection.ip} <-> {port.connection.ip}")
-						
-		# open / close / disconnect a specific port
-		elif (args[1].lower() in ["open", "close", "disconnect", "dc"]):
-			if (len(args) <= 2):
-				print(f"{COLOR.RED}No port specified{COLOR.WHITE}")
-				continue
-
-			if (not args[2].isdecimal()):
-				print(f"{COLOR.RED}Not a number{COLOR.WHITE}")
-				continue
-
-			if (int(args[2]) > 1024):
-				print(f"{COLOR.RED}Port doesn't exist{COLOR.WHITE}")
-				continue
-
-			action = args[1].lower()
-			port = ports[int(args[2]) - 1]
-
-			if (action == "open"): 
-				port.Open()
-				print(f"{COLOR.LIGHTGREEN}Port {port.num} opened{COLOR.WHITE}")
-				
-			if (action == "close"):
-				connection = port.connection
-				port.Close()
-				print(f"{COLOR.RED}Port {port.num} closed{COLOR.WHITE}")
-
-				if (type(connection) == BAIT):
-					AddFailure(NO_CONNECTION(""))
-					failure = GetFailure("NO_CONNECTION")
-					print(f"{COLOR.RED}NO_CONNECTION ERROR, CODE {failure.code}{COLOR.WHITE}")
-					
-					networkInterface = False
-					break
-
-			if (action in ["dc", "disconnect"]): 
-				print(f"Port {port.num} disconnected, disconnected {port.connection.ip}")
-				port.Disconnect()
-
-		elif (args[1].lower() == "scan"):
-			# finish when i have actual dangers from the network
-			pass
-
-		elif (args[1].lower() == "monitor"):
-			if (len(args) <= 2):
-				print(f"{COLOR.RED}No port specified{COLOR.WHITE}")
-				continue
-
-			if (not args[2].isdecimal()):
-				print(f"{COLOR.RED}Not a number{COLOR.WHITE}")
-				continue
-
-			port = int(args[2])
-
-			if (port > 1024):
-				print(f"{COLOR.RED}Port doesn't exist{COLOR.WHITE}")
-				continue
-
-			print("Press ENTER to stop monitoring")
-
-			monitorPortThread = threading.Thread(target=MonitorPort, args=[port])
-			monitoringPort = True
-			monitorPortThread.start()
-
-			input("")
-
-			monitoringPort = False
-			monitorPortThread.join()
-
 def Request(fileName):
 	if (IsFailure("NO_CONNECTION")):
 		failure = GetFailure("NO_CONNECTION")
@@ -563,12 +398,7 @@ def Request(fileName):
 		print(f"{COLOR.RED}File doesn't exist{COLOR.WHITE}")
 		return
 
-	text = file.read()	
-
-	corruptor = GetCyberattack(CORRUPTOR)
-	if (corruptor != None):
-		corruptAmountLUT = (0, 0.01, 0.05, 0.15, 0.3, 0.8)
-		text = CorruptText(text, corruptAmountLUT[corruptor.phase])
+	text = file.read()
 
 	print("---------------------------")	
 	print(text)
@@ -617,28 +447,7 @@ def PowerUpdate():
 				regen *= 0.8
 			else:
 				regen *= 0.6
-
-		# cyberattacks that effect power gain	
-		powerFeeder = GetCyberattack(POWER_FEEDER)
-		overLoader = GetCyberattack(OVERLOADER)
-		if (powerFeeder != None):
-			if (powerFeeder.uploaded):
-				print("a")
-				regen *= 1.35
-
-		if (overLoader != None):
-			if (overLoader.phase >= 1):
-				regen *= 0.5
-				preventFailures = [
-					"REAC_FAILURE",
-					"BACKUP_REAC_FAILURE",
-					"COOLER_ERROR"
-		       			]
-			
-				for failure in preventFailures:
-					curFailure = GetFailure(failure)
-					if (curFailure != None): failures.remove(curFailure)
-
+		
 		time.sleep(regen)
 
 def FailureUpdate():
@@ -718,147 +527,6 @@ def UpgradeUpdate():
 			upgrade.Update()
 
 		time.sleep(1)
-		
-def PortUpdate():
-	global endGame
-	global xp
-	global monitoringPort
-	global networkInterface
-
-	while True:
-		if (accessTier < 3):
-			continue
-
-		for port in ports:
-			# for opening ports automatically
-			if (not port.open):
-				openPort = random.randint(1, 19000) == 1
-				if (openPort): port.Open()
-
-			if (port.open):
-				closePort = random.randint(1, 1000) == 1
-				if (closePort and port.state in ["LISTENING", "IDLE"]): port.Close()
-
-			# adding/modifying connections
-			if (port.open):
-				internalConnection = random.randint(1, 10) == 1
-				if (port.internalConnection == None and internalConnection): 
-					connection = copy.deepcopy(random.choice(safeInternalConnections))
-					ip = GenerateIP()
-					connection.ip = ip
-					
-					randNum = random.randint(1, connection.chance)
-
-					# changes for special types of connections
-					if (type(connection) == BROADCAST):
-						broadcastMessages = [
-							"Don't forget to stay hydrated!"
-						]
-						connection.interval = random.randint(10, 40) 
-						connection.broadcastText = random.choice(broadcastMessages)
-
-					if (randNum == 1): 
-						port.ConnectInternal(connection)
-					else: port.ConnectInternal(Connection(ip, ""))
-
-				elif (port.internalConnection != None and internalConnection):
-					connection.internalConnection = None
-
-			# for cyberattack updating
-			if (type(port.connection) == BUG):
-				attack = port.connection
-				if (attack.complete): 
-					AddRandomFailure(100)
-					attack.complete = False
-
-			elif (type(port.connection) == POWER_FEEDER):
-				if (port.connection.time == 0):
-					CheckAddFailure(REAC_FAILURE(""))
-					CheckAddFailure(POWER_FAILURE(""))
-
-			elif (type(port.connection) == DOOR_SHUTDOWN):
-				if (port.connection.time == 0):
-					for i in range(port.connection.amount): AddFailure(DOOR_FAILURE)
-
-			elif (type(port.connection) == OVERLOADER):
-				if (port.connection.phase == 2):
-					if (port.connection.time == 59): print(f"{COLOR.RED}WARNING! NUCLEAR REACTOR OVERLOAD DETECTED. RESOLVE IMMEDIATELY! {COLOR.WHITE}")
-					if (port.connection.time == 25): print(f"{COLOR.RED}WARNING! NUCLEAR REACTOR IN CRITICAL STATE. RESOLVE IMMEDIATELY! {COLOR.WHITE}")
-					if (port.connection.time == 5): print(f"{COLOR.RED}WARNING! NUCLEAR REACTOR MELTDOWN IMMINENT. EVACUATE. {COLOR.WHITE}")
-
-				if (port.connection.phase == 3):
-					endGame = True
-
-			elif (type(port.connection) == BAIT):
-				xp -= 2
-				if (xp < 0):
-					xp = 0
-
-			elif (type(port.connection) == BREACHER):
-				if (port.connection.time == 0):
-					for i in range(port.connection.amount): 
-						AddFailure(CONTAINMENT_ERROR(""))
-				
-				if (port.connection.time == 0):
-					port.Disconnect()
-					monitoringPort = False
-					continue
-
-			elif (type(port.connection) == KILLBOT):
-				if (port.connection.time == 0):
-					port.Disconnect()
-					monitoringPort = False
-					networkInterface = False
-
-					AddFailure(NO_CONNECTION(""))
-					failures[len(failures) - 1].code = f"{COLOR.RED}KILLBOT.EXE{COLOR.WHITE}"
-					print(f"{COLOR.RED}NO_CONNECTION ERROR{COLOR.WHITE}")
-					break
-
-			elif (type(port.connection) == REQUEST_FILE):
-				if (port.connection.done):
-					port.Disconnect()
-
-			port.Update()
-			
-		time.sleep(1)
-
-def CyberattackUpdate():
-	while True:
-		# cyberattacks
-		cyberattack = copy.deepcopy(random.choice(cyberattacks))
-		addAttack = random.randint(1, cyberattack.chance) == 1
-			
-		port = GetRandomOpenPort(1000)
-		if (addAttack and port != None and port.state != "NOT_BOUND"):
-			ip = GenerateIP()
-
-			cyberattack.ip = ip
-			port.Connect(cyberattack)
-
-		# non malicious connections
-		connection = copy.deepcopy(random.choice(safeConnections))
-		addConnection = random.randint(1, connection.chance) == 1
-
-		port = GetRandomOpenPort(1000)
-		if (addConnection and port != None and port.state != "NOT_BOUND"):
-			ip = GenerateIP()
-			connection.ip = ip
-
-			if (type(connection) == REQUEST_FILE):
-				connection.fileName = "a.txt"
-				connection.lifetime = 60
-
-			port.Connect(connection)
-
-		# adds a regular connection if a custom one isnt added
-		if (not addConnection and port != None and port.state != "NOT_BOUND"):
-			addConnection = random.randint(1, 40) == 1
-			if (addConnection):
-				ip = GenerateIP()
-				port.Connect(Connection(ip, ""))
-
-		time.sleep(1)	
 
 # used to manage leveling up
 def AddXP(addXP, reason = "Failure fixed"):
@@ -903,22 +571,6 @@ def AddXP(addXP, reason = "Failure fixed"):
 				print(f"   - Check mail for more information")
 
 				mails.append(CreateMail("tier3"))
-				
-
-def MonitorPort(port):
-	port = ports[port - 1]
-
-	while monitoringPort:
-		internalConnectionStr = "--"
-		if (port.internalConnection != None): internalConnectionStr = port.internalConnection.ip
-		connectionStr = "--"
-		if (port.connection != None): connectionStr = port.connection.ip
-
-		if (port.data != ""):
-			print(f"[{connectionStr} -> {internalConnectionStr}] {port.data}")
-		if (port.internalData != ""):
-			print(f"[{internalConnectionStr} -> {connectionStr}] {port.internalData}")
-		time.sleep(1)
 
 # utility functions
 def IsFailure(failureName):
@@ -980,59 +632,6 @@ def GetUpgrade(name):
 		
 	return None
 
-def GetPort(num):
-	return ports[num - 1]
-
-def GetCyberattack(cyberattackType):
-	for port in ports:
-		if (type(port.connection) == cyberattackType):
-			return port.connection
-		
-	return None
-
-def CorruptText(text, corruptAmount):
-	chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()[]{}/|\\'\"+_-="
-	textList = []
-	doneIndexes = []
-
-	for char in text:
-		textList.append(char)
-
-	maxIndex = len(text) - 1
-	corruptChars = int(len(text) * corruptAmount)
-
-	for i in range(corruptChars):
-		randomIndex = random.randint(0, maxIndex)
-		textList[randomIndex] = random.choice(chars)
-
-	text = ""
-	for char in textList:
-		text += char
-
-	return text
-
-def GenerateIP():
-	ipString = ""
-	for i in range(4):
-		ipString += str(random.randint(1, 255))
-		if (i != 3): ipString += "."	
-	return ipString
-
-def GetRandomOpenPort(maxIterations):
-	port = random.choice(ports)
-
-	while (port.state != "LISTENING"):
-		port = random.choice(ports)
-		maxIterations -= 1
-		if (maxIterations == 0):
-			break
-
-	if (port.state != "LISTENING"):
-		time.sleep(1)
-		return None
-	
-	return port
-
 endGame = False
 
 grace = True
@@ -1055,24 +654,12 @@ upgrades = [
 	Upgrade("Construction System", 1, [100, 110], [60, 150], [3, 4])
 ]
 
-networkInterface = False
-monitoringPort = False
-ports = []
-for i in range(1024):
-	ports.append(
-		Port(i + 1, False, "", None, None)
-	)
-
 powerUpdate = threading.Thread(target=PowerUpdate)
 failureUpdate = threading.Thread(target=FailureUpdate)
 upgradeUpdate = threading.Thread(target=UpgradeUpdate)
-portUpdate = threading.Thread(target=PortUpdate)
-cyberattackUpdate = threading.Thread(target=CyberattackUpdate)
 powerUpdate.start()
 failureUpdate.start()
 upgradeUpdate.start()
-portUpdate.start()
-cyberattackUpdate.start()
 
 print("---------- SITE KILO-CHARLIE-7 MANAGEMENT TERMINAL ----------")
 print(f"{COLOR.BLUE}Please type 'mail' to view your current emails{COLOR.WHITE}")
@@ -1126,17 +713,10 @@ while True:
 		gracePeriod = 0
 
 	elif (args[0].lower() == "network" and accessTier >= 3):
-		if (IsFailure("NO_CONNECTION")):
-			failure = GetFailure("NO_CONNECTION")
-			print(f"{COLOR.RED}NO_CONNECTION, CODE {failure.code}{COLOR.WHITE}")
-			continue
-
-		Network()
+		pass
 
 print("GAME ENDED")
 
 powerUpdate.join()
 failureUpdate.join()
 upgradeUpdate.join()
-portUpdate.join()
-cyberattackUpdate.join()
