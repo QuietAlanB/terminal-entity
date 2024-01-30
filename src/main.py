@@ -732,35 +732,37 @@ def PortUpdate():
 		for port in ports:
 			# for opening ports automatically
 			if (not port.open):
-				randNum = random.randint(1, 25000)
-				if (randNum == 1):
+				openPort = random.randint(1, 19000) == 1
+				if (openPort): port.Open()
+
+			if (port.open):
+				closePort = random.randint(1, 1000) == 1
+				if (closePort and port.state in ["LISTENING", "IDLE"]): port.Close()
+
+			# adding/modifying connections
+			if (port.open):
+				internalConnection = random.randint(1, 10) == 1
+				if (port.internalConnection == None and internalConnection): 
+					connection = copy.deepcopy(random.choice(safeInternalConnections))
 					ip = GenerateIP()
+					connection.ip = ip
+					
+					randNum = random.randint(1, connection.chance)
 
-					num = random.randint(1, 20)
+					# changes for special types of connections
+					if (type(connection) == BROADCAST):
+						broadcastMessages = [
+							"Don't forget to stay hydrated!"
+						]
+						connection.interval = random.randint(10, 40) 
+						connection.broadcastText = random.choice(broadcastMessages)
 
-					if (num <= 15): port.ConnectInternal(Connection(ip, ""))
-					elif (num <= 17): 
-						broadcastMessage = random.choice(
-							[
-								"Don't forget to stay hydrated!",
-								"Reminder to ALWAYS contact your supervisors if you ever see suspicious activity!",
-								"Do not accept any suspicious emails! You WILL be at fault if any damage occurs."
-							]
-						)
-						interval = random.randint(10, 45)
-						port.ConnectInternal(BROADCAST(ip, broadcastMessage, interval))	
+					if (randNum == 1): 
+						port.ConnectInternal(connection)
+					else: port.ConnectInternal(Connection(ip, ""))
 
-					elif (num <= 20):
-						port.ConnectInternal(ECHO(ip))
-
-					port.Open()
-
-			# for closing ports automatically
-			elif (port.open):
-				randNum = random.randint(1, 19000)
-				if (randNum == 1):
-					if (random.randint(1, 4) == 1): port.Close()
-					port.internalConnection = None
+				elif (port.internalConnection != None and internalConnection):
+					connection.internalConnection = None
 
 			# for cyberattack updating
 			if (type(port.connection) == BUG):
@@ -825,25 +827,10 @@ def CyberattackUpdate():
 	while True:
 		# cyberattacks
 		cyberattack = copy.deepcopy(random.choice(cyberattacks))
-		randNum = 0
-		if (cyberattack.chance >= 1):
-			chance = cyberattack.chance
-			randNum = random.randint(1, chance)
+		addAttack = random.randint(1, cyberattack.chance) == 1
 			
-		if (randNum == 1):
-			port = random.choice(ports)
-			maxIterations = 1000
-
-			while (port.state != "LISTENING"):
-				port = random.choice(ports)
-				maxIterations -= 1
-				if (maxIterations == 0):
-					break
-
-			if (port.state != "LISTENING"):
-				time.sleep(1)
-				continue
-
+		port = GetRandomOpenPort(1000)
+		if (addAttack and port != None and port.state != "NOT_BOUND"):
 			ip = GenerateIP()
 
 			cyberattack.ip = ip
@@ -851,42 +838,25 @@ def CyberattackUpdate():
 
 		# non malicious connections
 		connection = copy.deepcopy(random.choice(safeConnections))
-		randNum = 0
-		if (connection.chance >= 1):
-			chance = connection.chance
-			randNum = random.randint(1, chance)
-			
-		if (randNum == 1):
-			port = random.choice(ports)
-			maxIterations = 1000
+		addConnection = random.randint(1, connection.chance) == 1
 
-			while (port.state != "LISTENING"):
-				port = random.choice(ports)
-				maxIterations -= 1
-				if (maxIterations == 0):
-					break
-
-			if (port.state != "LISTENING"):
-				time.sleep(1)
-				continue
-
+		port = GetRandomOpenPort(1000)
+		if (addConnection and port != None and port.state != "NOT_BOUND"):
 			ip = GenerateIP()
-
 			connection.ip = ip
+
 			if (type(connection) == REQUEST_FILE):
-				fileNames = [
-					"note_a.txt",
-					"note_b.txt",
-					"note_c.txt",
-					"important_notice.txt",
-					"important_message.txt",
-					"ENT-080.txt",
-					"sharesystem.p",
-					"found.txt"
-				]
-				connection.fileName = random.choice(fileNames)
-				connection.lifetime = random.randint(40, 200)
+				connection.fileName = "a.txt"
+				connection.lifetime = 60
+
 			port.Connect(connection)
+
+		# adds a regular connection if a custom one isnt added
+		if (not addConnection and port != None and port.state != "NOT_BOUND"):
+			addConnection = random.randint(1, 40) == 1
+			if (addConnection):
+				ip = GenerateIP()
+				port.Connect(Connection(ip, ""))
 
 		time.sleep(1)	
 
@@ -1044,9 +1014,24 @@ def CorruptText(text, corruptAmount):
 def GenerateIP():
 	ipString = ""
 	for i in range(4):
-		ipString += str(random.randint(0, 255))
+		ipString += str(random.randint(1, 255))
 		if (i != 3): ipString += "."	
 	return ipString
+
+def GetRandomOpenPort(maxIterations):
+	port = random.choice(ports)
+
+	while (port.state != "LISTENING"):
+		port = random.choice(ports)
+		maxIterations -= 1
+		if (maxIterations == 0):
+			break
+
+	if (port.state != "LISTENING"):
+		time.sleep(1)
+		return None
+	
+	return port
 
 endGame = False
 

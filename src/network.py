@@ -89,7 +89,7 @@ class Connection:
 # NON MALICIOUS
 class ECHO(Connection):
 	def __init__(self, ip):
-		super().__init__(ip, "", 0)
+		super().__init__(ip, "", 7)
 	
 	def Update(self, port):
 		if (port.data != ""):
@@ -97,7 +97,7 @@ class ECHO(Connection):
 
 class BROADCAST(Connection):
 	def __init__(self, ip, broadcastText, interval):
-		super().__init__(ip, "", 0)
+		super().__init__(ip, "", 15)
 		self.broadcastText = broadcastText
 		self.interval = interval
 		self.time = 0
@@ -115,7 +115,7 @@ class BROADCAST(Connection):
 # NON MALICIOUS
 class REQUEST_FILE(Connection):
 	def __init__(self, ip, fileName, lifetime):
-		super().__init__(ip, "", 1)
+		super().__init__(ip, "", 15)
 		self.time = lifetime
 		self.maxTime = lifetime
 		self.fileName = fileName
@@ -138,7 +138,7 @@ class REQUEST_FILE(Connection):
 # cyberattacks
 class BUG(Connection):
 	def __init__(self, ip):
-		super().__init__(ip, "", 240)
+		super().__init__(ip, "", 180)
 		self.time = 60
 		self.complete = False
 		
@@ -154,7 +154,7 @@ class BUG(Connection):
 
 class FIX_KILL(Connection):
 	def __init__(self, ip):
-		super().__init__(ip, "", 290)
+		super().__init__(ip, "", 220)
 		self.time = 20
 		self.uploaded = False
 		self.started = False
@@ -200,7 +200,7 @@ class FIX_KILL(Connection):
 
 class POWER_FEEDER(Connection):
 	def __init__(self, ip):
-		super().__init__(ip, "", 330)
+		super().__init__(ip, "", 260)
 		self.time = 50
 		self.uploaded = False
 
@@ -220,7 +220,7 @@ class POWER_FEEDER(Connection):
 
 class DOOR_SHUTDOWN(Connection):
 	def __init__(self, ip):
-		super().__init__(ip, "", 310)
+		super().__init__(ip, "", 210)
 		self.time = 60
 		self.amount = random.randint(6, 10)
 
@@ -238,7 +238,7 @@ class DOOR_SHUTDOWN(Connection):
 
 class OVERLOADER(Connection):
 	def __init__(self, ip):
-		super().__init__(ip, "", 280)
+		super().__init__(ip, "", 240)
 		self.time = 80
 		self.phase = 0
 
@@ -267,7 +267,7 @@ class OVERLOADER(Connection):
 
 class CORRUPTOR(Connection):
 	def __init__(self, ip):
-		super().__init__(ip, "", 210)
+		super().__init__(ip, "", 150)
 		self.time = 180
 		self.phase = 0
 
@@ -301,7 +301,7 @@ class BAIT(Connection):
 
 class BREACHER(Connection):
 	def __init__(self, ip):
-		super().__init__(ip, "", 430)
+		super().__init__(ip, "", 300)
 		self.time = 70	
 		self.amount = random.randint(3, 5)
 
@@ -315,7 +315,7 @@ class BREACHER(Connection):
 
 class KILLBOT(Connection):
 	def __init__(self, ip):
-		super().__init__(ip, "", 600)
+		super().__init__(ip, "", 500)
 		self.time = 15
 
 	def Update(self, port):
@@ -340,4 +340,9 @@ cyberattacks = [
 
 safeConnections = [
 	REQUEST_FILE("", "", 0)
+]
+
+safeInternalConnections = [
+	ECHO(""),
+	BROADCAST("", "", 0)
 ]
