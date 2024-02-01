@@ -52,4 +52,3 @@ class Client:
 	# still need to figure out what this will do
 	def Diagnose(self, num):
 		pass
-

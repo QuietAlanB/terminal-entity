@@ -31,25 +31,25 @@ if (playStart):
 	time.sleep(1.2)
 	print("MEMORY CHECK ", end="", flush=True)
 	time.sleep(0.8)
-	print(f"[ {COLOR.LIGHTGREEN}OK{COLOR.WHITE} ]")
+	print(f"[ {COLOR.LIGHTGREEN}OK{COLOR.RESET} ]")
 	time.sleep(0.2)
 	print("    TOP OF RAM IS 7FFFFFFFFFFFFFFF HEX")
 	time.sleep(0.4)
 
 	print("CPU CHECK ", end="", flush=True)
 	time.sleep(0.6)
-	print(f"[ {COLOR.LIGHTGREEN}OK{COLOR.WHITE} ]")
+	print(f"[ {COLOR.LIGHTGREEN}OK{COLOR.RESET} ]")
 	time.sleep(0.3)
 	print("    1.2 GHZ Process speed")
 	time.sleep(0.1)
 	print("    IOStream check ", end="", flush=True)
 	time.sleep(0.9)
-	print(f"[ {COLOR.LIGHTGREEN}OK{COLOR.WHITE} ]")
+	print(f"[ {COLOR.LIGHTGREEN}OK{COLOR.RESET} ]")
 	time.sleep(0.4)
 
 	print("GRAPHICS DISPLAY ", end="", flush=True)
 	time.sleep(0.7)
-	print(f"[ {COLOR.LIGHTGREEN}OK{COLOR.WHITE} ]")
+	print(f"[ {COLOR.LIGHTGREEN}OK{COLOR.RESET} ]")
 	time.sleep(0.3)
 	print("    60Hz refresh rate")
 	time.sleep(0.4)
@@ -63,9 +63,9 @@ if (playStart):
 	print("")
 
 	time.sleep(0.2)
-	print(f"{COLOR.YELLOW}CONNECTING TO ON-SITE NETWORK THROUGH PORT 21...{COLOR.WHITE}")
+	print(f"{COLOR.YELLOW}CONNECTING TO ON-SITE NETWORK THROUGH PORT 21...{COLOR.RESET}")
 	time.sleep(2.1)
-	print(f"{COLOR.LIGHTGREEN}CONNECTION ESTABLISHED{COLOR.WHITE}")
+	print(f"{COLOR.LIGHTGREEN}CONNECTION ESTABLISHED{COLOR.RESET}")
 	time.sleep(0.4)
 
 	print(">> ", end="", flush=True)
@@ -98,7 +98,7 @@ if (playStart):
 	print("")
 	time.sleep(0.4)
 	
-	print(f"{COLOR.LIGHTGREEN}Connection established{COLOR.WHITE}")
+	print(f"{COLOR.LIGHTGREEN}Connection established{COLOR.RESET}")
 	time.sleep(0.2)
 	print(f"Downloading data... [1/3]")
 	time.sleep(1.8)
@@ -106,7 +106,7 @@ if (playStart):
 	time.sleep(2.2)
 	print(f"Downloading data... [3/3]")
 	time.sleep(1.3)
-	print(f"{COLOR.LIGHTGREEN}Download complete{COLOR.WHITE}")
+	print(f"{COLOR.LIGHTGREEN}Download complete{COLOR.RESET}")
 	time.sleep(0.1)
 	
 	print(">> ", end="", flush=True)
@@ -131,35 +131,35 @@ if (playStart):
 
 	print("Checking firmware ", end="", flush=True)
 	time.sleep(0.5)
-	print(f"[ {COLOR.LIGHTGREEN}OK{COLOR.WHITE} ]")
+	print(f"[ {COLOR.LIGHTGREEN}OK{COLOR.RESET} ]")
 	time.sleep(0.3)
 
 	print("NETWORK CONNECTION ", end="", flush=True)
 	time.sleep(0.6)
-	print(f"[ {COLOR.LIGHTGREEN}OK{COLOR.WHITE} ]")
+	print(f"[ {COLOR.LIGHTGREEN}OK{COLOR.RESET} ]")
 	time.sleep(0.2)
 
 	print("POWER SUPPLY CONNECTION ", end="", flush=True)
 	time.sleep(0.7)
-	print(f"[ {COLOR.LIGHTGREEN}OK{COLOR.WHITE} ]")
+	print(f"[ {COLOR.LIGHTGREEN}OK{COLOR.RESET} ]")
 	time.sleep(0.2)
 
 	print("SERVER CONNECTION ", end="", flush=True)
 	time.sleep(1.7)
-	print(f"[ {COLOR.RED}FAIL{COLOR.WHITE} ]")
+	print(f"[ {COLOR.RED}FAIL{COLOR.RESET} ]")
 	time.sleep(0.2)
-	print(f"    {COLOR.YELLOW}CONNECTING TO 10.65.3.124...{COLOR.WHITE}")
+	print(f"    {COLOR.YELLOW}CONNECTING TO 10.65.3.124...{COLOR.RESET}")
 	time.sleep(2.1)
-	print(f"    {COLOR.LIGHTGREEN}CONNECTION SUCCESSFUL{COLOR.WHITE}")
+	print(f"    {COLOR.LIGHTGREEN}CONNECTION SUCCESSFUL{COLOR.RESET}")
 	time.sleep(0.4)
 	print("SERVER CONNECTION ", end="", flush=True)
 	time.sleep(0.7)
-	print(f"[ {COLOR.LIGHTGREEN}OK{COLOR.WHITE} ]")
+	print(f"[ {COLOR.LIGHTGREEN}OK{COLOR.RESET} ]")
 	time.sleep(0.3)
 
 	print("Confirming connection with USB_P1_SEND...")
 	time.sleep(1.8)
-	print(f"    {COLOR.LIGHTGREEN}Confirmed. Heartbeat recieved{COLOR.WHITE}")
+	print(f"    {COLOR.LIGHTGREEN}Confirmed. Heartbeat recieved{COLOR.RESET}")
 	time.sleep(0.7)
 	print(f"    080 online")
 	time.sleep(0.1)
@@ -179,11 +179,11 @@ if (playStart):
 def Check():
 	percent = round(power / maxPower * 100, 2)
 	print("POWER STATUS:", end=" ", flush=True)
-	if (percent >= 100): print(f"{COLOR.BLUE}FULL{COLOR.WHITE}")
-	elif (percent >= 60): print(f"{COLOR.LIGHTGREEN}HIGH{COLOR.WHITE}")
-	elif (percent >= 30): print(f"{COLOR.YELLOW}MEDIUM{COLOR.WHITE}")
-	elif (percent >= 10): print(f"{COLOR.ORANGE}LOW{COLOR.WHITE}")
-	elif (percent >= 0): print(f"{COLOR.DARKRED}CRITICAL{COLOR.WHITE}")
+	if (percent >= 100): print(f"{COLOR.BLUE}FULL{COLOR.RESET}")
+	elif (percent >= 60): print(f"{COLOR.LIGHTGREEN}HIGH{COLOR.RESET}")
+	elif (percent >= 30): print(f"{COLOR.YELLOW}MEDIUM{COLOR.RESET}")
+	elif (percent >= 10): print(f"{COLOR.ORANGE}LOW{COLOR.RESET}")
+	elif (percent >= 0): print(f"{COLOR.DARKRED}CRITICAL{COLOR.RESET}")
 	print(f"[ {power} / {maxPower} ]")
 	print("")
 	print(f"ACCESS TIER: {accessTier}")
@@ -192,7 +192,7 @@ def Check():
 def Scan():
 	if (IsFailure("SCANNER_FAILURE")):
 		failure = GetFailure("SCANNER_FAILURE")
-		print(f"{COLOR.RED}SCANNER_FAILURE ERROR, CODE {failure.code}{COLOR.WHITE}")
+		print(f"{COLOR.RED}SCANNER_FAILURE ERROR, CODE {failure.code}{COLOR.RESET}")
 		return
 
 	print("Scanning for failures...")
@@ -212,13 +212,13 @@ def Scan():
 	time.sleep(duration)
 
 	if (len(failures) <= 0):
-		print(f"{COLOR.LIGHTGREEN}No failures found{COLOR.WHITE}")
+		print(f"{COLOR.LIGHTGREEN}No failures found{COLOR.RESET}")
 		return
 	
-	print(f"{COLOR.RED}{len(failures)} failure(s) found{COLOR.WHITE}")
+	print(f"{COLOR.RED}{len(failures)} failure(s) found{COLOR.RESET}")
 	time.sleep(0.3)
 	for failure in failures:
-		print(f"    {COLOR.RED}{failure.name}, CODE {failure.code}{COLOR.WHITE}")
+		print(f"    {COLOR.RED}{failure.name}, CODE {failure.code}{COLOR.RESET}")
 		time.sleep(0.1)
 
 def Fix(code):
@@ -227,10 +227,10 @@ def Fix(code):
 
 	# for KILLBOT cyberattack
 	if (code.upper() == "KILLBOT.EXE"):
-		print(f"{COLOR.RED}Code not found{COLOR.WHITE}")
+		print(f"{COLOR.RED}Code not found{COLOR.RESET}")
 		return
-	if (code.upper() == f"{COLOR.RED}KILLBOT.EXE{COLOR.WHITE}"):
-		print(f"{COLOR.RED}yeah nice try{COLOR.WHITE}")
+	if (code.upper() == f"{COLOR.RED}KILLBOT.EXE{COLOR.RESET}"):
+		print(f"{COLOR.RED}yeah nice try{COLOR.RESET}")
 		return
 
 	failure = None
@@ -239,27 +239,27 @@ def Fix(code):
 			failure = failure_
 
 	if (failure == None):
-		print(f"{COLOR.RED}Code not found{COLOR.WHITE}")
+		print(f"{COLOR.RED}Code not found{COLOR.RESET}")
 		return
 	
 	if (power < failure.cost):
-		print(f"{COLOR.RED}Not enough power ({failure.cost} needed) {COLOR.WHITE}")
+		print(f"{COLOR.RED}Not enough power ({failure.cost} needed) {COLOR.RESET}")
 		return
 
 	power -= failure.cost
 	fixed = failure.Puzzle()
 	if (fixed):
-		print(f"{COLOR.LIGHTGREEN}Failure {failure.code} fixed{COLOR.WHITE}")
+		print(f"{COLOR.LIGHTGREEN}Failure {failure.code} fixed{COLOR.RESET}")
 		AddXP(failure.xp)
 		failures.remove(failure)
 		return
 	
-	print(f"{COLOR.RED}Fix was not successful, {failure.code} could not be fixed{COLOR.WHITE}")
+	print(f"{COLOR.RED}Fix was not successful, {failure.code} could not be fixed{COLOR.RESET}")
 
 def Mails():
 	if (IsFailure("NO_CONNECTION")):
 		failure = GetFailure("NO_CONNECTION")
-		print(f"{COLOR.RED}NO_CONNECTION ERROR, CODE {failure.code}{COLOR.WHITE}")
+		print(f"{COLOR.RED}NO_CONNECTION ERROR, CODE {failure.code}{COLOR.RESET}")
 		return
 
 	if (len(mails) == 0):
@@ -281,13 +281,13 @@ def Mails():
 			return
 
 	if (not mailArgs[1].isdecimal()):
-		print(f"{COLOR.RED}Not a number{COLOR.WHITE}")
+		print(f"{COLOR.RED}Not a number{COLOR.RESET}")
 		return
 
 	index = int(mailArgs[1]) - 1
 
 	if (index > len(mails) - 1 or index < 0):
-		print(f"{COLOR.RED}Mail not found{COLOR.WHITE}")
+		print(f"{COLOR.RED}Mail not found{COLOR.RESET}")
 		return
 
 	if (mailArgs[0] in ["open", "read"]):
@@ -301,25 +301,25 @@ def UpgradeSystem():
 	global power
 	constructionSystem = GetUpgrade("Construction System")
 	if (constructionSystem.upgrading):
-		print(f"{COLOR.RED}CONSTRUCTION SYSTEM CURRENTLY UNDER MAINTENANCE{COLOR.WHITE}")
+		print(f"{COLOR.RED}CONSTRUCTION SYSTEM CURRENTLY UNDER MAINTENANCE{COLOR.RESET}")
 
 	for upgrade in upgrades:
 		print("---------------")
 		if (len(upgrade.powerLevels) == upgrade.level - 1):
-			print(f"{COLOR.BLUE}{upgrade.name}{COLOR.WHITE} LEVEL {upgrade.level}")
+			print(f"{COLOR.BLUE}{upgrade.name}{COLOR.RESET} LEVEL {upgrade.level}")
 			print(f"    UPGRADE AT MAX LEVEL")
 			continue
 
-		print(f"{COLOR.BLUE}{upgrade.name}{COLOR.WHITE} LEVEL {upgrade.level} -> LEVEL {upgrade.level + 1}")
+		print(f"{COLOR.BLUE}{upgrade.name}{COLOR.RESET} LEVEL {upgrade.level} -> LEVEL {upgrade.level + 1}")
 		if (upgrade.upgrading):
-			print(f"    {COLOR.ORANGE}CURRENTLY UPGRADING{COLOR.WHITE}")
+			print(f"    {COLOR.ORANGE}CURRENTLY UPGRADING{COLOR.RESET}")
 			print(f"    TIME LEFT: {upgrade.time} seconds")
 			continue
 
 		print(f"    COST: {upgrade.power} power")
 		print(f"    TIME: {upgrade.time} seconds")
 		if (accessTier < upgrade.access):
-			print(f"{COLOR.RED}    ACCESS TIER {upgrade.access} REQUIRED{COLOR.WHITE}")
+			print(f"{COLOR.RED}    ACCESS TIER {upgrade.access} REQUIRED{COLOR.RESET}")
 
 	print("Type the name of a system to upgrade it")
 	upgradeInput = input("Upgrade >> ")
@@ -330,28 +330,28 @@ def UpgradeSystem():
 
 		if (IsFailure("CONSTRUCT_SYS_FAILURE")):
 			failure = GetFailure("CONSTRUCT_SYS_FAILURE")
-			print(f"{COLOR.RED}CONSTRUCT_SYS_FAILURE ERROR, CODE {failure.code}{COLOR.WHITE}")
+			print(f"{COLOR.RED}CONSTRUCT_SYS_FAILURE ERROR, CODE {failure.code}{COLOR.RESET}")
 			break
 
 		if (IsFailure("NO_CONNECTION")):
 			failure = GetFailure("NO_CONNECTION")
-			print(f"{COLOR.RED}NO_CONNECTION ERROR, CODE {failure.code}{COLOR.WHITE}")
+			print(f"{COLOR.RED}NO_CONNECTION ERROR, CODE {failure.code}{COLOR.RESET}")
 			break
 
 		if (len(upgrade.powerLevels) == upgrade.level - 1):
-			print(f"{COLOR.RED}Upgrade at max level{COLOR.WHITE}")
+			print(f"{COLOR.RED}Upgrade at max level{COLOR.RESET}")
 			break
 
 		if (power < upgrade.power):
-			print(f"{COLOR.RED}Not enough power{COLOR.WHITE}")
+			print(f"{COLOR.RED}Not enough power{COLOR.RESET}")
 			break
 
 		if (upgrade.upgrading):
-			print(f"{COLOR.RED}Currently upgrading{COLOR.WHITE}")
+			print(f"{COLOR.RED}Currently upgrading{COLOR.RESET}")
 			break
 		
 		if (constructionSystem.upgrading):
-			print(f"{COLOR.RED}Construction system currently under maintenance{COLOR.WHITE}")
+			print(f"{COLOR.RED}Construction system currently under maintenance{COLOR.RESET}")
 			break
 
 		upgradeSystemLevel = constructionSystem.level
@@ -365,7 +365,7 @@ def UpgradeSystem():
 		currentUpgrades += 1
 
 		if (currentUpgrades > maxUpgrades):
-			print(f"{COLOR.RED}Maximum concurrent upgrades ({maxUpgrades} upgrades){COLOR.WHITE}")
+			print(f"{COLOR.RED}Maximum concurrent upgrades ({maxUpgrades} upgrades){COLOR.RESET}")
 			break
 
 		power -= upgrade.power
@@ -379,12 +379,12 @@ def UpgradeSystem():
 def Request(fileName):
 	if (IsFailure("NO_CONNECTION")):
 		failure = GetFailure("NO_CONNECTION")
-		print(f"{COLOR.RED}NO_CONNECTION, CODE {failure.code}{COLOR.WHITE}")
+		print(f"{COLOR.RED}NO_CONNECTION, CODE {failure.code}{COLOR.RESET}")
 		return
 
 	if (IsFailure("SERVER_ERROR")):
 		failure = GetFailure("SERVER_ERROR")
-		print(f"{COLOR.RED}SERVER_ERROR, CODE {failure.code}{COLOR.WHITE}")
+		print(f"{COLOR.RED}SERVER_ERROR, CODE {failure.code}{COLOR.RESET}")
 		return
 
 	filePath = "res/files/" + fileName
@@ -392,10 +392,10 @@ def Request(fileName):
 	try:
 		file = open(filePath, "r")
 	except FileNotFoundError:
-		print(f"{COLOR.RED}File doesn't exist{COLOR.WHITE}")
+		print(f"{COLOR.RED}File doesn't exist{COLOR.RESET}")
 		return
 	except OSError:
-		print(f"{COLOR.RED}File doesn't exist{COLOR.WHITE}")
+		print(f"{COLOR.RED}File doesn't exist{COLOR.RESET}")
 		return
 
 	text = file.read()
@@ -426,14 +426,14 @@ def Network():
 			if (server == None): 
 				server = GetServerByName(args[1].upper())
 			if (server == None):
-				print(f"{COLOR.RED}Server doesn't exist{COLOR.WHITE}")
+				print(f"{COLOR.RED}Server doesn't exist{COLOR.RESET}")
 				continue
 
 			# client info
 			if (len(args) >= 3):
 				client = server.GetClient(args[2])
 				if (client == None):
-					print(f"{COLOR.RED}Client doesn't exist{COLOR.WHITE}")
+					print(f"{COLOR.RED}Client doesn't exist{COLOR.RESET}")
 					continue
 
 				print("CLIENT INFO")
@@ -452,10 +452,10 @@ def Network():
 
 		if (args[0].lower() == "server"):
 			if (len(args) < 3):
-				print(f"{COLOR.RED}Unknown arguments{COLOR.WHITE}")
+				print(f"{COLOR.RED}Unknown arguments{COLOR.RESET}")
 				continue
 			if (len(args) == 3 and args[1].lower() == "disconnect"):
-				print(f"{COLOR.RED}Specify a client{COLOR.WHITE}")
+				print(f"{COLOR.RED}Specify a client{COLOR.RESET}")
 				continue
 
 			action = args[1].lower()
@@ -465,13 +465,13 @@ def Network():
 			if (server == None):
 				server = GetServerByName(args[2].upper())
 			if (server == None):
-				print(f"{COLOR.RED}Server doesn't exist{COLOR.WHITE}")
+				print(f"{COLOR.RED}Server doesn't exist{COLOR.RESET}")
 				continue
 
 			# cant manage server if its rebooting or flushing
 			if (not server.IsActive()):
-				print(f"{COLOR.RED}Server is not active yet{COLOR.WHITE}")
-				print(f"{COLOR.RED}Server state: {server.state}{COLOR.WHITE}")
+				print(f"{COLOR.RED}Server is not active yet{COLOR.RESET}")
+				print(f"{COLOR.RED}Server state: {server.state}{COLOR.RESET}")
 				continue
 			
 			# get client if there is a 2nd argument
@@ -479,7 +479,7 @@ def Network():
 			if (len(args) >= 4):
 				client = server.GetClient(args[3])
 				if (client == None):
-					print(f"{COLOR.RED}Client doesn't exist{COLOR.WHITE}")
+					print(f"{COLOR.RED}Client doesn't exist{COLOR.RESET}")
 					continue
 
 			match action:
@@ -501,19 +501,19 @@ def Network():
 					if (server.state == "OPEN"): 
 						print("Server already open")
 						continue
-					print(f"{COLOR.LIGHTGREEN}Server opened{COLOR.WHITE}")
+					print(f"{COLOR.LIGHTGREEN}Server opened{COLOR.RESET}")
 					server.state = "OPEN"
 			
 				case "close":
 					if (server.state == "CLOSED"): 
 						print("Server already closed")
 						continue
-					print(f"{COLOR.RED}Server closed{COLOR.WHITE}")
+					print(f"{COLOR.RED}Server closed{COLOR.RESET}")
 					server.state = "CLOSED"
 
 		elif (args[0].lower() == "diagnose"):
 			if (len(args) < 4):
-				print(f"{COLOR.RED}Unknown arguments{COLOR.WHITE}")
+				print(f"{COLOR.RED}Unknown arguments{COLOR.RESET}")
 
 			
 # game mecha
@@ -659,7 +659,7 @@ def AddXP(addXP, reason = "Failure fixed"):
 
 	xp += addXP
 
-	print(f"{COLOR.WHITE}+{addXP} EXP - {reason}{COLOR.WHITE}")
+	print(f"{COLOR.RESET}+{addXP} EXP - {reason}{COLOR.RESET}")
 
 	if (xp >= maxXP):
 		leftoverXP = xp % maxXP
@@ -667,7 +667,7 @@ def AddXP(addXP, reason = "Failure fixed"):
 
 		accessTier += 1
 
-		print(f"{COLOR.BLUE}ACCESS TIER {accessTier}{COLOR.WHITE} - UNLOCKED")
+		print(f"{COLOR.BLUE}ACCESS TIER {accessTier}{COLOR.RESET} - UNLOCKED")
 
 		maxXPLT = (200, 350, 500, 780, 1000, 1750)
 		maxPowerLT = (110, 130, 150, 200, 250, 300)
@@ -677,18 +677,18 @@ def AddXP(addXP, reason = "Failure fixed"):
 		maxPower = maxPowerLT[accessTier - 2]
 		powerRegen = powerRegenLT[accessTier - 2]
 
-		print(f"   {COLOR.WHITE}- {COLOR.BLUE}Maximum power{COLOR.WHITE} increased to {maxPower}")
+		print(f"   {COLOR.RESET}- {COLOR.BLUE}Maximum power{COLOR.RESET} increased to {maxPower}")
 
 		match accessTier:
 			case 2:
-				print(f"   - {COLOR.BLUE}CONSTRUCTION SYSTEM{COLOR.WHITE} available - use with 'upgrade' command")
+				print(f"   - {COLOR.BLUE}CONSTRUCTION SYSTEM{COLOR.RESET} available - use with 'upgrade' command")
 				print(f"   - Check mail for more information")
 
 				mails.append(CreateMail("tier2"))
 
 			case 3:
-				print(f"   - {COLOR.BLUE}NETWORK SYSTEM{COLOR.WHITE} available - use with 'network' command")
-				print(f"   - New threat: {COLOR.BLUE}CYBERATTACKS{COLOR.WHITE}")
+				print(f"   - {COLOR.BLUE}NETWORK SYSTEM{COLOR.RESET} available - use with 'network' command")
+				print(f"   - New threat: {COLOR.BLUE}CYBERATTACKS{COLOR.RESET}")
 				print(f"   - Check mail for more information")
 
 				mails.append(CreateMail("tier3"))
@@ -824,8 +824,8 @@ upgradeUpdate.start()
 serverUpdate.start()
 
 print("---------- SITE KILO-CHARLIE-7 MANAGEMENT TERMINAL ----------")
-print(f"{COLOR.BLUE}Please type 'mail' to view your current emails{COLOR.WHITE}")
-print(f"{COLOR.BLUE}Type '1' in the mail interface to view your first mail{COLOR.WHITE}")
+print(f"{COLOR.BLUE}Please type 'mail' to view your current emails{COLOR.RESET}")
+print(f"{COLOR.BLUE}Type '1' in the mail interface to view your first mail{COLOR.RESET}")
 
 while True:
 	try:
@@ -836,10 +836,10 @@ while True:
 
 	if (args[0].lower() == "exit"):
 		chars = "ABCDEF0123456789"
-		print(f"{COLOR.RED}CRITICAL ERROR ENCOUNTERED. PRINTING CORE DUMP.{COLOR.WHITE}")
+		print(f"{COLOR.RED}CRITICAL ERROR ENCOUNTERED. PRINTING CORE DUMP.{COLOR.RESET}")
 		time.sleep(0.6)
 		for i in range(601):
-			print(f"{COLOR.RED}{random.choice(chars)}{COLOR.WHITE}", end="", flush=True)
+			print(f"{COLOR.RED}{random.choice(chars)}{COLOR.RESET}", end="", flush=True)
 			if (i % 50 == 0 and i != 0): print("")
 			if (i % 20 == 0): time.sleep(0.0001)
 
@@ -852,7 +852,7 @@ while True:
 
 	elif (args[0].lower() == "scan"):
 		if (power < 5):
-			print(f"{COLOR.RED}Not enough power{COLOR.WHITE}")
+			print(f"{COLOR.RED}Not enough power{COLOR.RESET}")
 			continue
 		
 		power -= 5
@@ -872,7 +872,7 @@ while True:
 
 	elif (args[0].lower() in ["req", "request"]):
 		if (len(args) <= 1):
-			print(f"{COLOR.RED}No file specified{COLOR.WHITE}")
+			print(f"{COLOR.RED}No file specified{COLOR.RESET}")
 			continue
 
 		Request(args[1])
@@ -889,7 +889,7 @@ while True:
 		Network()
 
 if (endGame == True):
-	print(f"{COLOR.DARKRED}GAME ENDED.{COLOR.WHITE}")
+	print(f"{COLOR.DARKRED}GAME ENDED.{COLOR.RESET}")
 
 powerUpdate.join()
 failureUpdate.join()
