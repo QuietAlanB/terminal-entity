@@ -70,24 +70,24 @@ if (playStart):
 
 	print(">> ", end="", flush=True)
 	time.sleep(0.6)
-	for char in "ping 10.238.44.149 /n 3":
+	for char in "ping 10.60.1.200 /n 3":
 		print(char, end="", flush=True)
 		time.sleep(0.02)
 
 	time.sleep(0.2)
 	print("")
 	time.sleep(0.2)
-	print("Pinging 10.238.44.149 with 32 bytes of data:")
+	print("Pinging 10.60.1.200 with 32 bytes of data:")
 	time.sleep(0.75)
-	print("    Reply from 10.238.44.149: bytes=32 time=15ms")
+	print("    Reply from 10.60.1.200: bytes=32 time=15ms")
 	time.sleep(0.75)
-	print("    Reply from 10.238.44.149: bytes=32 time=16ms")
+	print("    Reply from 10.60.1.200: bytes=32 time=16ms")
 	time.sleep(0.75)
-	print("    Reply from 10.238.44.149: bytes=32 time=16ms")
+	print("    Reply from 10.60.1.200: bytes=32 time=16ms")
 	time.sleep(0.75)
 	print("")
 	time.sleep(3.3)
-	print("FTP connection request from 10.238.44.149 at PORT 21")
+	print("FTP connection request from 10.60.1.200 at PORT 21")
 	time.sleep(0.3)
 	print("Accept? y/n")
 	time.sleep(0.1)
@@ -148,7 +148,7 @@ if (playStart):
 	time.sleep(1.7)
 	print(f"[ {COLOR.RED}FAIL{COLOR.WHITE} ]")
 	time.sleep(0.2)
-	print(f"    {COLOR.YELLOW}CONNECTING TO PORT 22...{COLOR.WHITE}")
+	print(f"    {COLOR.YELLOW}CONNECTING TO 10.65.3.124...{COLOR.WHITE}")
 	time.sleep(2.1)
 	print(f"    {COLOR.LIGHTGREEN}CONNECTION SUCCESSFUL{COLOR.WHITE}")
 	time.sleep(0.4)
@@ -405,7 +405,118 @@ def Request(fileName):
 	print("---------------------------")
 	file.close()
 
-# game mechanics
+def Network():
+	while True:
+		inText = input("Network >> ")
+		args = inText.split(" ")
+
+		if (inText.lower() == "exit"):
+			break
+
+		elif (inText.lower() == "list"):
+			print(f"    SERVER    |        IP       |     STATE")
+			for server in servers:
+				print(f"{server.name : <13} | IP: {server.ip} | STATE: {server.state}")
+
+		if (len(args) <= 1): continue
+
+		if (args[0].lower() == "info"):
+			client = None
+			server = GetServerByIP(args[1].lower())
+			if (server == None): 
+				server = GetServerByName(args[1].upper())
+			if (server == None):
+				print(f"{COLOR.RED}Server doesn't exist{COLOR.WHITE}")
+				continue
+
+			# client info
+			if (len(args) >= 3):
+				client = server.GetClient(args[2])
+				if (client == None):
+					print(f"{COLOR.RED}Client doesn't exist{COLOR.WHITE}")
+					continue
+
+				print("CLIENT INFO")
+				print(f"IP: {client.ip}")
+				continue
+
+			# server info
+			print("     SERVER INFO")
+			print(f"{'NAME' : <7} | {server.name}")
+			print(f"{'IP' : <7} | {server.ip}")
+			print(f"{'STATE' : <7} | {server.state}")
+			print(f"{'CLIENTS' : <7} | ", end="")
+			for client in server.clients:
+				print(f"{client.ip} ", end="")
+			print("")
+
+		if (args[0].lower() == "server"):
+			if (len(args) < 3):
+				print(f"{COLOR.RED}Unknown arguments{COLOR.WHITE}")
+				continue
+			if (len(args) == 3 and args[1].lower() == "disconnect"):
+				print(f"{COLOR.RED}Specify a client{COLOR.WHITE}")
+				continue
+
+			action = args[1].lower()
+
+			# get server
+			server = GetServerByIP(args[2].lower())
+			if (server == None):
+				server = GetServerByName(args[2].upper())
+			if (server == None):
+				print(f"{COLOR.RED}Server doesn't exist{COLOR.WHITE}")
+				continue
+
+			# cant manage server if its rebooting or flushing
+			if (not server.IsActive()):
+				print(f"{COLOR.RED}Server is not active yet{COLOR.WHITE}")
+				print(f"{COLOR.RED}Server state: {server.state}{COLOR.WHITE}")
+				continue
+			
+			# get client if there is a 2nd argument
+			client = None
+			if (len(args) >= 4):
+				client = server.GetClient(args[3])
+				if (client == None):
+					print(f"{COLOR.RED}Client doesn't exist{COLOR.WHITE}")
+					continue
+
+			match action:
+				case "disconnect":
+					print(f"Client {client.ip} disconnected")
+					server.RemoveClient(client)
+
+				case "reboot":
+					server.clients = []
+					server.SetState("REBOOTING")
+					server.time = 20
+
+				case "flush":
+					print("Flushing server...")
+					server.SetState("FLUSHING")
+					server.time = 10
+
+				case "open":
+					if (server.state == "OPEN"): 
+						print("Server already open")
+						continue
+					print(f"{COLOR.LIGHTGREEN}Server opened{COLOR.WHITE}")
+					server.state = "OPEN"
+			
+				case "close":
+					if (server.state == "CLOSED"): 
+						print("Server already closed")
+						continue
+					print(f"{COLOR.RED}Server closed{COLOR.WHITE}")
+					server.state = "CLOSED"
+
+		elif (args[0].lower() == "diagnose"):
+			if (len(args) < 4):
+				print(f"{COLOR.RED}Unknown arguments{COLOR.WHITE}")
+
+			
+# game mecha
 def PowerUpdate():
 	global power
 	global maxPower
@@ -528,6 +639,16 @@ def UpgradeUpdate():
 
 		time.sleep(1)
 
+def ServerUpdate():
+	global endGame
+	while True:
+		if (endGame): break
+
+		for server in servers:
+			server.Update()
+
+		time.sleep(1)
+
 # used to manage leveling up
 def AddXP(addXP, reason = "Failure fixed"):
 	global xp
@@ -571,6 +692,7 @@ def AddXP(addXP, reason = "Failure fixed"):
 				print(f"   - Check mail for more information")
 
 				mails.append(CreateMail("tier3"))
+
 
 # utility functions
 def IsFailure(failureName):
@@ -632,6 +754,32 @@ def GetUpgrade(name):
 		
 	return None
 
+def GenerateIP(a = 0, b = 0, c = 0, d = 0):
+	if (a == 0): a = random.randint(1, 255)
+	if (b == 0): b = random.randint(1, 255)
+	if (c == 0): c = random.randint(1, 255)
+	if (d == 0): d = random.randint(1, 255)
+
+	return f"{a}.{b}.{c}.{d}"
+
+def GetServerByIP(ip):
+	for server in servers:
+		if (server.ip == ip):
+			return server
+	return None
+
+def GetServerByName(name):
+	for server in servers:
+		if (server.name == name):
+			return server
+	return None
+
+def GetClient(server, ip):
+	for client in server.clients:
+		if (client.ip == ip):
+			return client
+	return None
+
 endGame = False
 
 grace = True
@@ -641,7 +789,7 @@ maxPower = 100
 xp = 0
 maxXP = 100
 accessTier = 5
-powerRegen = 2 # the higher this is, the slower it is
+powerRegen = 1 # the higher this is, the slower it is
 	       # (seconds between power regens)
 
 failures = []
@@ -654,12 +802,26 @@ upgrades = [
 	Upgrade("Construction System", 1, [100, 110], [60, 150], [3, 4])
 ]
 
+servers = [
+	Server("SERVER_DATA", "10.60.1.200"),
+	Server("COMMUNICATION", "10.34.8.201"),
+	Server("COMPUTER", "10.65.2.124"),
+	Server("SYSTEM", "10.65.3.124"),
+	Server("NETWORK", "10.77.5.101"),
+	Server("POWER_SYSTEM", "10.21.7.168")
+]
+
+# open all servers
+for server in servers: server.SetState("OPEN")
+
 powerUpdate = threading.Thread(target=PowerUpdate)
 failureUpdate = threading.Thread(target=FailureUpdate)
 upgradeUpdate = threading.Thread(target=UpgradeUpdate)
+serverUpdate = threading.Thread(target=ServerUpdate)
 powerUpdate.start()
 failureUpdate.start()
 upgradeUpdate.start()
+serverUpdate.start()
 
 print("---------- SITE KILO-CHARLIE-7 MANAGEMENT TERMINAL ----------")
 print(f"{COLOR.BLUE}Please type 'mail' to view your current emails{COLOR.WHITE}")
@@ -670,6 +832,17 @@ while True:
 		inText = input(">> ")
 		args = inText.split(" ")
 	except KeyboardInterrupt:
+		endGame = True
+
+	if (args[0].lower() == "exit"):
+		chars = "ABCDEF0123456789"
+		print(f"{COLOR.RED}CRITICAL ERROR ENCOUNTERED. PRINTING CORE DUMP.{COLOR.WHITE}")
+		time.sleep(0.6)
+		for i in range(601):
+			print(f"{COLOR.RED}{random.choice(chars)}{COLOR.WHITE}", end="", flush=True)
+			if (i % 50 == 0 and i != 0): print("")
+			if (i % 20 == 0): time.sleep(0.0001)
+
 		endGame = True
 
 	if (endGame): break
@@ -713,10 +886,12 @@ while True:
 		gracePeriod = 0
 
 	elif (args[0].lower() == "network" and accessTier >= 3):
-		pass
+		Network()
 
-print("GAME ENDED")
+if (endGame == True):
+	print(f"{COLOR.DARKRED}GAME ENDED.{COLOR.WHITE}")
 
 powerUpdate.join()
 failureUpdate.join()
 upgradeUpdate.join()
+serverUpdate.join()
