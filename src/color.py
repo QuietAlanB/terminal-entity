@@ -5,8 +5,8 @@
 # more info found here (scroll down a bit):
 # https://gist.github.com/fnky/458719343aabd01cfb17a3a4f7296797
 
-
 class COLOR:
+	RESET = "\x1b[0m"
 	RED = "\x1b[38;5;160m"
 	DARKRED = "\x1b[38;5;88m"
 	ORANGE = "\x1b[38;5;208m"

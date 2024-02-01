@@ -144,7 +144,7 @@ class REAC_FAILURE(Failure):
 		for i in range(12):
 			string += random.choice(chars)
 
-		print(f"Quickly rewrite this string of characters in {COLOR.RED}6 seconds{COLOR.WHITE}:")
+		print(f"Quickly rewrite this string of characters in {COLOR.RED}6 seconds{COLOR.RESET}:")
 		print(string)
 
 		startTime = time.time()
@@ -168,7 +168,7 @@ class REAC_FAILURE(Failure):
 
 			print("")
 
-		print(f"How many dots are shown? You have {COLOR.RED}16 seconds{COLOR.WHITE} to answer.")
+		print(f"How many dots are shown? You have {COLOR.RED}16 seconds{COLOR.RESET} to answer.")
 
 		startTime = time.time()
 		answer = input(">> ").strip(" ")
@@ -247,10 +247,10 @@ class COOLER_ERROR(Failure):
 
 		# warning
 		if (self.time == 60):
-			print(f"{COLOR.DARKRED}WARNING! MAIN REACTOR CORE AT DANGEROUS TEMPERATURES! RESOLVE IMMEDIATELY.{COLOR.WHITE}")
+			print(f"{COLOR.DARKRED}WARNING! MAIN REACTOR CORE AT DANGEROUS TEMPERATURES! RESOLVE IMMEDIATELY.{COLOR.RESET}")
 
 		if (self.time == 10):
-			print(f"{COLOR.DARKRED}WARNING! MAIN REACTOR CORE AT CRITICAL STATE! REACTOR MELTDOWN IMMINENT.{COLOR.WHITE}")
+			print(f"{COLOR.DARKRED}WARNING! MAIN REACTOR CORE AT CRITICAL STATE! REACTOR MELTDOWN IMMINENT.{COLOR.RESET}")
 
 class BOILER_FAILURE(Failure):
 	def __init__(self, code):
@@ -430,11 +430,11 @@ class NETWORK_PROBLEM(Failure):
 			indexes = action.split(" ")
 
 			if (len(indexes) <= 1):
-				print(f"{COLOR.RED}Input 2 indexes to swap{COLOR.WHITE}")
+				print(f"{COLOR.RED}Input 2 indexes to swap{COLOR.RESET}")
 				continue
 
 			if (not indexes[0].isdecimal() or not indexes[1].isdecimal()):
-				print(f"{COLOR.RED}Not a number{COLOR.WHITE}")
+				print(f"{COLOR.RED}Not a number{COLOR.RESET}")
 				continue
 
 			try:
@@ -443,7 +443,7 @@ class NETWORK_PROBLEM(Failure):
 				nums[int(indexes[1]) - 1] = temp
 
 			except IndexError:
-				print(f"{COLOR.RED}Out of list bounds{COLOR.WHITE}")
+				print(f"{COLOR.RED}Out of list bounds{COLOR.RESET}")
 				continue
 
 			print(f"[ ", end="")
@@ -489,13 +489,13 @@ class SERVER_ERROR(Failure):
 			coordinates = coordinates.split(" ")
 
 			if (len(coordinates) <= 1):
-				print(f"{COLOR.RED}Input an X and Y coordinate seperated by a space{COLOR.WHITE}")
+				print(f"{COLOR.RED}Input an X and Y coordinate seperated by a space{COLOR.RESET}")
 				continue
 
 			x, y = coordinates
 
 			if (not x.isdecimal() or not y.isdecimal()):
-				print(f"{COLOR.RED}Not a number{COLOR.WHITE}")
+				print(f"{COLOR.RED}Not a number{COLOR.RESET}")
 				continue
 
 			x = int(x)
@@ -504,7 +504,7 @@ class SERVER_ERROR(Failure):
 			try:
 				blocks[y - 1][x - 1] = "█"
 			except IndexError:
-				print(f"{COLOR.RED}Out of bounds coordinates{COLOR.WHITE}")
+				print(f"{COLOR.RED}Out of bounds coordinates{COLOR.RESET}")
 				continue
 
 			# show grid
@@ -534,12 +534,12 @@ class FIREWALL_ERROR(Failure):
 
 		displayString = ""
 		for colorChar in colorString:
-			if (colorChar == "r"): displayString += f"{COLOR.RED}█{COLOR.WHITE}"
-			elif (colorChar == "o"): displayString += f"{COLOR.ORANGE}█{COLOR.WHITE}"
-			elif (colorChar == "y"): displayString += f"{COLOR.YELLOW}█{COLOR.WHITE}"
-			elif (colorChar == "g"): displayString += f"{COLOR.LIGHTGREEN}█{COLOR.WHITE}"
-			elif (colorChar == "b"): displayString += f"{COLOR.LIGHTBLUE}█{COLOR.WHITE}"
-			elif (colorChar == "p"): displayString += f"{COLOR.PURPLE}█{COLOR.WHITE}"
+			if (colorChar == "r"): displayString += f"{COLOR.RED}█{COLOR.RESET}"
+			elif (colorChar == "o"): displayString += f"{COLOR.ORANGE}█{COLOR.RESET}"
+			elif (colorChar == "y"): displayString += f"{COLOR.YELLOW}█{COLOR.RESET}"
+			elif (colorChar == "g"): displayString += f"{COLOR.LIGHTGREEN}█{COLOR.RESET}"
+			elif (colorChar == "b"): displayString += f"{COLOR.LIGHTBLUE}█{COLOR.RESET}"
+			elif (colorChar == "p"): displayString += f"{COLOR.PURPLE}█{COLOR.RESET}"
 
 		print("Type the first letter of all of these colors")
 		print(displayString)

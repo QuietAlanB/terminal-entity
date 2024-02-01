@@ -32,4 +32,4 @@ class Upgrade:
                                 self.level += 1
                                 self.upgrading = False
                                 self.UpdateValues()
-                                print(f"{COLOR.BLUE}{self.name}{COLOR.WHITE} finished upgrading")
+                                print(f"{COLOR.BLUE}{self.name}{COLOR.RESET} finished upgrading")
